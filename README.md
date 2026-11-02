@@ -1,7 +1,7 @@
 # 맞춤 프로틴
 
 쿠팡 프로틴 랭킹 상품을 비교하고 추천하는 사이트입니다.
-사이트 주소: https://dongho562-source.github.io/protein-fit/
+사이트 주소: https://proteinfit.github.io/
 
 | 파일 | 내용 | 바뀌는 때 |
 |---|---|---|
