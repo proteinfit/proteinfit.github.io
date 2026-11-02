@@ -1,0 +1,1266 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>맞춤 프로틴</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style id="css">
+/* Layout: 쇼핑몰처럼 익숙한 화면 — 상단 검색바, 상품 카드 그리드, 정렬 탭, 별점·리뷰 수, 왼쪽 필터. */
+:root{
+  --bg:#F3F4F6; --panel:#FFFFFF; --ink:#111111; --muted:#6B6B6B; --line:#E3E5E8; --rule:#D5D8DC;
+  --accent:#2F64F5; --accent-ink:#FFFFFF; --accent-soft:#EDF2FF;
+  --price:#E0201F; --star:#FF9A00; --thumb:#F6F7F9;
+  --good:#0E8A3E; --good-soft:#E5F5EA; --warn:#B4500A; --warn-soft:#FFF1E2;
+  --f-body:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",-apple-system,BlinkMacSystemFont,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1114; --panel:#181B20; --ink:#EDEFF2; --muted:#9AA1AB; --line:#2A2F36; --rule:#363C45;
+  --accent:#7C9DFF; --accent-ink:#0B1022; --accent-soft:#1B2442;
+  --price:#FF6B63; --star:#FFB23F; --thumb:#20242B;
+  --good:#5FD08A; --good-soft:#13291C; --warn:#F2AA4C; --warn-soft:#2E220F; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1114; --panel:#181B20; --ink:#EDEFF2; --muted:#9AA1AB; --line:#2A2F36; --rule:#363C45;
+  --accent:#7C9DFF; --accent-ink:#0B1022; --accent-soft:#1B2442;
+  --price:#FF6B63; --star:#FFB23F; --thumb:#20242B;
+  --good:#5FD08A; --good-soft:#13291C; --warn:#F2AA4C; --warn-soft:#2E220F; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--panel)}
+.in{max-width:1200px;margin:0 auto;padding-inline:16px}
+.wrap{padding-bottom:64px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* 상단 바 */
+header.top{background:var(--panel);border-bottom:1px solid var(--line)}
+.util{font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
+.util .in{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 14px;padding-block:6px}
+.stamp{display:flex;flex-wrap:wrap;gap:2px 14px}
+.stamp span+span::before{content:"";display:inline-block;width:1px;height:10px;background:var(--line);margin-right:14px;vertical-align:-1px}
+.gnb{display:flex;align-items:center;gap:14px 28px;padding-block:18px 14px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;flex:none}
+.brand h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-.04em;line-height:1.1}
+.brand h1 span{color:var(--accent)}
+.brand p.by{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.brand p.by b{color:var(--ink);font-weight:700}
+.sbar{flex:1 1 380px;min-width:0;display:flex;border:2px solid var(--accent);border-radius:4px;background:var(--panel);height:46px}
+.search{flex:1;min-width:0;border:0;background:none;padding:0 14px;font-size:15px}
+.search:focus{outline:none}
+.sbtn{flex:none;width:52px;border:0;background:none;cursor:pointer;color:var(--accent);display:grid;place-items:center}
+.sbtn svg{width:24px;height:24px}
+.tabs{display:flex;gap:2px;overflow-x:auto}
+.tab{background:none;border:0;padding:12px 16px 11px;font-weight:700;font-size:15px;color:var(--ink);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--accent);border-color:var(--accent)}
+.tab .n-all{font-weight:700}
+.intro{padding-block:14px 0;color:var(--muted);font-size:13px}
+.intro p{margin:0;text-wrap:pretty}
+.intro .disc{margin-top:2px;font-size:12px}
+section[role=tabpanel]{padding-top:14px}
+
+/* 공통 상자 */
+.box{background:var(--panel);border:1px solid var(--line);border-radius:6px}
+
+/* 맞춤 추천 */
+.rec{max-width:900px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.tab-badge{display:inline-block;margin-left:4px;font-size:11px;font-weight:700;color:#fff;background:var(--price);border-radius:3px;padding:0 5px;vertical-align:2px}
+.askbar{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:12px;padding:12px 16px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:6px;text-align:left;cursor:pointer;font-size:14px}
+.askbar b{color:var(--accent)}
+.askgo{margin-left:auto;flex:none;font-weight:800;color:var(--accent);white-space:nowrap}
+@media (max-width:640px){.askbar{flex-wrap:wrap}.askgo{margin-left:46px}}
+.ava{flex:none;width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+.chat{padding:16px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;gap:8px;align-items:flex-start;max-width:100%}
+.msg .bub{background:var(--bg);border-radius:4px 14px 14px 14px;padding:9px 13px;font-size:14.5px;line-height:1.55;max-width:min(560px,100%);text-wrap:pretty}
+.msg .bub .cov{margin-top:4px}
+.msg.me{justify-content:flex-end}
+.msg.me .bub{background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px 4px 14px 14px;cursor:pointer;font-weight:600;text-align:left}
+.msg.me .bub::after{content:" ✎";opacity:.7;font-weight:400}
+.chips.ans{margin-left:42px;animation:rise .25s ease both}
+.chips.ans{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.chips.ans .opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--rule);border-radius:10px;padding:12px 14px;font-size:15px;font-weight:700;min-height:60px;box-shadow:0 1px 2px rgb(0 0 0 / .05);transition:transform .1s}
+.chips.ans .opt:hover{border-color:var(--accent);transform:translateY(-1px)}
+.chips.ans .opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent)}
+.chips.ans .oi{font-size:24px;line-height:1;flex:none}
+.chips.ans .ot small{display:block;margin-top:2px;font-weight:500;font-size:12px;color:var(--muted)}
+.chips.ans .nextq{grid-column:1/-1;border-radius:10px;min-height:52px;font-size:16px}
+.hint{display:block;margin-top:6px;font-size:13px;font-weight:700;color:var(--accent)}
+@media (max-width:640px){.chips.ans{grid-template-columns:repeat(2,minmax(0,1fr))}.chips.ans .opt{padding:10px;gap:8px;font-size:14px}}
+.chat .algnote{margin-left:42px}
+.wdet{margin-left:42px;border:1px solid var(--line);border-radius:6px;padding:10px 12px}
+.wdet summary{cursor:pointer;font-weight:700;font-size:13.5px;color:var(--accent)}
+.wdet .q{padding:8px 0 0;border:0}
+.wdet .q h3{display:none}
+.chat-acts{margin-left:42px;display:flex;gap:16px;align-items:center}
+@media (max-width:640px){.chips.ans,.wdet,.chat-acts,.chat .algnote{margin-left:0}.chat{padding:12px}}
+.quiz{display:flex;flex-direction:column;gap:0;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);padding:4px 16px 12px;max-height:calc(100dvh - 24px);overflow:auto}
+@media (max-width:880px){.quiz{position:static;max-height:none;overflow:visible}}
+.quiz-t{margin:0;padding:12px 0;font-size:16px;font-weight:800;border-bottom:2px solid var(--ink)}
+.q{display:flex;flex-direction:column;gap:8px;padding:14px 0;border-bottom:1px solid var(--line)}
+.q h3{margin:0;font-size:14px;font-weight:700;display:flex;gap:6px;align-items:baseline}
+.q h3 .step{color:var(--accent);font-size:12px;font-weight:800}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--rule);background:var(--panel);border-radius:4px;padding:6px 11px;font-size:13.5px;cursor:pointer;line-height:1.3;text-align:left;min-height:40px}
+.chip small{display:block;font-size:11.5px;color:var(--muted)}
+.chip:hover{border-color:var(--accent)}
+.chip[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:var(--accent);font-weight:700}
+.chip[aria-pressed="true"] small{color:var(--accent);opacity:.85;font-weight:500}
+.jump{display:none;font-size:13px;font-weight:700;color:var(--accent);padding:10px 0}
+@media (max-width:880px){.jump{display:inline}}
+@media (prefers-reduced-motion:no-preference){@keyframes rise{from{transform:translateY(6px);opacity:.4}to{transform:none;opacity:1}}}
+.wpanel{border-bottom:0}
+.wnote{margin:0;font-size:12px;color:var(--muted)}
+.wrows{display:flex;flex-direction:column;gap:4px}
+.wrow{display:grid;grid-template-columns:76px minmax(0,1fr) 38px;gap:10px;align-items:center;font-size:13px}
+.wrow input[type=range]{width:100%;margin:0;accent-color:var(--accent);height:24px}
+.wrow b{text-align:right;font-size:12.5px}
+.reset{align-self:flex-start;background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:10px 0;font-size:13px}
+
+.res-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:4px 16px;margin-bottom:10px}
+.res-head h2{margin:0;font-size:20px;font-weight:800;text-wrap:balance}
+.res-head p{margin:0;color:var(--muted);font-size:13px}
+.podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:1080px){.podium{grid-template-columns:minmax(0,1fr)}}
+
+/* 상품 썸네일 (사진 대신 맛 색 · 주원료 표시) */
+.thumb{position:relative;display:block;aspect-ratio:1/1;background:var(--thumb);border-radius:4px;overflow:hidden}
+.thumb svg{position:absolute;inset:14% 22% 8%;width:56%;height:78%}
+.thumb.photo{background:#fff}
+.thumb img{position:absolute;inset:5%;width:90%;height:90%;object-fit:contain}
+.thumb.photo:not(.noimg) svg,.thumb.photo:not(.noimg) .th-lab{display:none}
+.th-lab{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);font-size:12px;font-weight:800;color:#222;background:#fff;padding:1px 6px;border-radius:2px;white-space:nowrap;max-width:46%;overflow:hidden;text-overflow:ellipsis}
+.th-rk{position:absolute;left:0;top:0;min-width:26px;height:26px;padding:0 6px;display:grid;place-items:center;background:var(--accent);color:#fff;font-size:13px;font-weight:800;border-bottom-right-radius:4px}
+.th-cat{position:absolute;right:6px;top:6px;font-size:11px;font-weight:700;background:rgb(0 0 0 / .6);color:#fff;padding:1px 6px;border-radius:2px}
+
+/* 가격 · 별점 */
+.price{display:block;font-size:18px;font-weight:800;color:var(--price);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.price small{font-size:13px;font-weight:700}
+.unit .nw{white-space:nowrap}
+.price .sv{display:inline-block;font-size:12px;font-weight:500;color:var(--muted);margin-left:5px;letter-spacing:0;white-space:nowrap}
+.unit{display:block;font-size:12px;color:var(--muted)}
+.rate{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+.stars{position:relative;display:inline-block;color:var(--line);font-size:13px;letter-spacing:1px;line-height:1}
+.stars::before{content:"★★★★★";position:absolute;left:0;top:0;width:var(--r);overflow:hidden;color:var(--star);white-space:nowrap}
+
+/* 추천 카드 */
+@media (max-width:640px){.label .facts .row.mx{display:none}}
+.mxnote{display:none;margin:-4px 0 0;font-size:11.5px;color:var(--muted)}
+@media (max-width:640px){.mxnote{display:block}}
+.label{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.label:first-child{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.label .hd{display:flex;flex-direction:column;gap:8px}
+.label .thumb{aspect-ratio:16/10}
+.label .thumb svg{inset:10% 34% 6%;width:32%;height:84%}
+.label .th-lab{top:58%;max-width:30%}
+.label .th-rk{height:30px;min-width:auto;padding:0 10px;font-size:13px}
+@media (max-width:1080px){.label .hd{display:grid;grid-template-columns:180px minmax(0,1fr);gap:14px;align-items:start}.label .thumb{aspect-ratio:1/1}.label .thumb svg{inset:14% 22% 8%;width:56%;height:78%}.label .th-lab{top:60%;max-width:46%}}
+@media (max-width:640px){.label .hd{grid-template-columns:112px minmax(0,1fr);gap:12px}.label .th-rk{height:24px;padding:0 6px;font-size:11.5px}.label .th-lab{font-size:11px}.label .price{font-size:19px}}
+.label .info{display:flex;flex-direction:column;gap:3px;min-width:0}
+.label .nm{font-weight:600;font-size:15px;line-height:1.4;margin:0;text-wrap:pretty;overflow-wrap:anywhere}
+.label .mk{font-size:12px;color:var(--muted)}
+.label .price{font-size:21px;margin-top:2px}
+.fit{display:inline-flex;align-items:baseline;gap:4px;align-self:flex-start;margin-top:4px;background:var(--accent-soft);color:var(--accent);border-radius:3px;padding:2px 8px;font-size:12px;font-weight:700}
+.fit b{font-size:15px}
+.facts{border-top:1px solid var(--line)}
+.facts .row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line);font-size:13px}
+.facts .row>span:first-child{flex:none;white-space:nowrap;color:var(--muted)}
+.facts .row b{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.facts .row .rk{font-size:11px;color:var(--muted);margin-left:6px;font-weight:500}
+.why,.care{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.why li::before{content:"✓";color:var(--accent);font-weight:800;margin-right:6px}
+.care li{color:var(--warn)}
+.care li::before{content:"!";font-weight:800;margin-right:8px}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{max-width:100%;overflow:hidden;text-overflow:ellipsis;font-size:11px;padding:1px 6px;border-radius:2px;border:1px solid var(--rule);color:var(--muted);white-space:nowrap;line-height:1.5;font-weight:500}
+.tag.good{border-color:var(--good);color:var(--good)}
+.tag.muted{border-style:dashed}
+.tag.warn{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.tag.note{border-color:var(--warn);color:var(--warn)}
+.lblchk{margin:0;display:grid;grid-template-columns:7.5em 1fr;gap:6px 12px;font-size:13.5px;line-height:1.55}
+.lblchk dt{color:var(--muted);font-weight:600}
+.lblchk dd{margin:0;text-wrap:pretty}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:2px}
+.acts .btn.pri{flex:1 1 100%}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:4px;padding:9px 12px;font-size:13.5px;font-weight:700;text-decoration:none;cursor:pointer;border:1px solid var(--rule);background:var(--panel);min-height:40px}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);flex:1}
+.btn:hover{filter:brightness(1.05)}
+.acts .btn:not(.pri){flex:1}
+
+.algnote{margin:2px 0 0;font-size:12.5px;line-height:1.55;color:var(--warn);background:var(--warn-soft);border-radius:4px;padding:8px 10px;text-wrap:pretty}
+.rk.na,h4 .rk,.facts .row .rk.na{font-weight:500}
+.cov{margin:0;font-size:11.5px;color:var(--muted)}
+.facts .row b.txt{font-weight:600;text-align:right;white-space:normal}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer span{display:block;margin-bottom:4px}
+
+/* 상품 그리드 (전체 비교 · 다음 후보) */
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(186px,1fr));gap:10px}
+.irow{position:relative;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:6px;min-width:0}
+.irow:hover{box-shadow:0 4px 14px rgb(0 0 0 / .08);border-color:var(--rule)}
+.item{display:flex;flex-direction:column;gap:4px;padding:10px 10px 6px;cursor:pointer;background:none;border:0;text-align:left;width:100%;flex:1;min-width:0}
+.item .thumb{margin-bottom:6px;aspect-ratio:5/4}
+.item .thumb svg{inset:12% 27% 6%;width:46%;height:82%}
+.item .t{font-size:13.5px;line-height:1.4;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.8em}
+.item .spec{font-size:12px;color:var(--ink)}
+.item .spec i{font-style:normal;color:var(--muted)}
+.item .tags{margin-top:2px}
+.item .why1{display:block;margin-top:2px;font-size:12px;color:var(--muted);line-height:1.45}
+.cmp-tg{margin:0 10px 10px;border:1px solid var(--rule);background:var(--panel);border-radius:4px;padding:5px 0;font-size:12.5px;cursor:pointer;min-height:34px;color:var(--muted)}
+.cmp-tg[aria-pressed="true"],.btn.cmp-b[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.btn.cmp-b{font-weight:500}
+@media (max-width:640px){
+  .list{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .item{padding:8px 8px 4px}
+  .cmp-tg{margin:0 8px 8px}
+  .price{font-size:16px}
+}
+.empty{grid-column:1/-1;border:1px dashed var(--rule);border-radius:6px;background:var(--panel);padding:28px;text-align:center;color:var(--muted)}
+
+.tray{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--panel);border-top:1px solid var(--rule);box-shadow:0 -6px 20px rgb(0 0 0 / .1);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.tray-in{max-width:1168px;margin:0 auto;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.tray-k{font-weight:800;font-size:14px;flex:none}
+.tray-items{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 300px;min-width:0}
+.tray-it{display:inline-flex;align-items:center;gap:4px;max-width:100%;background:var(--accent-soft);border-radius:4px;padding:3px 4px 3px 10px;font-size:12.5px}
+.tray-it span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.tray-x{border:0;background:none;cursor:pointer;font-size:15px;line-height:1;width:22px;height:22px;border-radius:50%}
+.tray-acts{display:flex;gap:6px;flex:none}
+.tray-acts .btn.pri{flex:none}
+.tray-acts .btn:disabled{opacity:.55;cursor:default}
+.tray-msg{max-width:1168px;margin:4px auto 0;font-size:12px;color:var(--warn)}
+.tray-msg:empty{display:none}
+body.has-tray .wrap{padding-bottom:140px}
+.fab{display:none}
+@media (max-width:880px){.fab:not([hidden]){display:flex;position:fixed;left:16px;right:16px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:19;justify-content:center;align-items:center;gap:6px;min-height:48px;background:var(--accent);color:#fff;border-radius:6px;font-weight:800;font-size:15px;text-decoration:none;box-shadow:0 6px 18px rgb(0 0 0 / .18)}
+  .fab b{font-weight:500;opacity:.85;font-size:13px}
+  body.has-tray .fab{bottom:calc(150px + env(safe-area-inset-bottom,0px))}}
+@media (max-width:640px){.tray-items{flex-wrap:nowrap;overflow-x:auto;flex-basis:100%}.tray-it span{max-width:140px}.tray-acts{flex:1}.tray-acts .btn{flex:1}}
+dialog#cmp{max-width:min(1000px,calc(100vw - 24px))}
+.cmp-wrap{overflow-x:auto;margin-top:6px}
+table.cmp-t{border-collapse:separate;border-spacing:0;width:100%;min-width:560px;font-size:13px}
+table.cmp-t tbody th,table.cmp-t thead th:first-child,table.cmp-t tfoot th{position:sticky;left:0;z-index:1;background:var(--panel)}
+table.cmp-t th,table.cmp-t td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+table.cmp-t thead th{border-bottom:2px solid var(--ink);vertical-align:bottom}
+table.cmp-t tbody th{font-weight:600;color:var(--muted);white-space:nowrap;width:110px;font-size:12.5px;background:var(--bg)}
+table.cmp-t td{font-variant-numeric:tabular-nums}
+table.cmp-t td .rk{font-size:11px;color:var(--muted);margin-left:4px}
+table.cmp-t td.best{background:var(--good-soft)}
+.cmp-hint{display:none;margin:6px 0 0;font-size:12px;color:var(--muted)}
+@media (max-width:640px){table.cmp-t{min-width:0;width:auto}table.cmp-t td{min-width:140px;max-width:160px}table.cmp-t tbody th,table.cmp-t thead th:first-child,table.cmp-t tfoot th{width:72px;min-width:72px;max-width:72px;white-space:normal;font-size:12px;padding-left:4px}.cmp-hint{display:block}}
+.bmark{font-size:10.5px;color:var(--good);font-weight:700;white-space:nowrap}
+.warn-t{color:var(--warn);font-weight:700}
+.cmp-nm{all:unset;cursor:pointer;font-weight:700;font-size:13.5px;line-height:1.35;display:block;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px;overflow-wrap:anywhere}
+.cmp-nm:focus-visible{outline:2px solid var(--accent)}
+thead .rk.na{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:2px}
+.cmp-acts{display:flex;flex-direction:column;gap:6px}
+.cmp-acts .btn.pri{flex:none}
+.summary{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin-bottom:12px;display:flex;flex-direction:column;gap:6px}
+.sm-row{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:baseline}
+.sm-k{font-size:12px;font-weight:800;color:var(--accent)}
+.sm-row p{margin:0;font-size:13px;line-height:1.6;text-wrap:pretty}
+.sm-row b{font-weight:800}
+.more{margin-top:20px}
+.more h3{font-size:16px;font-weight:800;margin:0 0 8px}
+
+/* 전체 비교: 왼쪽 필터 + 정렬 탭 + 그리드 */
+.cat-wrap{display:grid;grid-template-columns:200px minmax(0,1fr);gap:20px;align-items:start}
+.side{padding:4px 14px 8px;min-width:0}
+.cat-wrap>*{min-width:0}
+.side .grp{display:flex;flex-direction:column;gap:0;padding:10px 0;border-bottom:1px solid var(--line)}
+.side .grp:last-child{border-bottom:0}
+.side .grp > span{font-size:14px;font-weight:800;margin-bottom:4px}
+.side .chip{border:0;background:none;padding:5px 0 5px 24px;min-height:32px;position:relative;font-size:13px;border-radius:0}
+.side .chip::before{box-sizing:border-box;content:"";position:absolute;left:0;top:50%;width:15px;height:15px;transform:translateY(-50%);border:1px solid var(--rule);border-radius:50%;background:var(--panel)}
+.side #f-flag .chip::before{border-radius:3px}
+.side .chip[aria-pressed="true"]{background:none;color:var(--accent);font-weight:700}
+.side .chip[aria-pressed="true"]::before{border:5px solid var(--accent)}
+.side #f-flag .chip[aria-pressed="true"]::before{border:0;background:var(--accent);content:"✓";color:#fff;font-size:11px;line-height:15px;text-align:center;font-weight:800}
+.sortbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 16px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4px 14px;margin-bottom:10px}
+.sorts{display:flex;flex-wrap:wrap;align-items:center}
+.sort{background:none;border:0;padding:8px 0;font-size:13px;color:var(--muted);cursor:pointer;min-height:36px}
+.sort+.sort::before{content:"";display:inline-block;width:1px;height:11px;background:var(--rule);margin:0 10px;vertical-align:-1px}
+.sort[aria-pressed="true"]{color:var(--accent);font-weight:800}
+.count{font-size:13px;color:var(--muted)}
+@media (max-width:640px){
+  .util .in>span:first-child{display:none}
+  .stamp{flex-direction:column;gap:0}
+  .stamp span+span::before{display:none}
+  .gnb{padding-block:12px 10px;gap:10px}
+  .brand h1{font-size:24px}
+  .sbar{flex-basis:100%;height:44px}
+  .sortbar{padding:2px 12px}
+  .sorts{flex-wrap:nowrap;overflow-x:auto;width:100%}
+  .sort{white-space:nowrap;flex:none}
+}
+@media (max-width:880px){
+  .cat-wrap{grid-template-columns:minmax(0,1fr);gap:10px}
+  .side{padding:2px 12px}
+  .side .grp{flex-direction:row;flex-wrap:nowrap;overflow-x:auto;align-items:center;gap:6px;padding:8px 0}
+  .side .grp > span{flex:none;font-size:12.5px;margin:0 4px 0 0;color:var(--muted)}
+  .side .chip{flex:none;border:1px solid var(--rule);border-radius:999px;padding:5px 12px;white-space:nowrap}
+  .side .chip::before{display:none}
+  .side .chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+}
+
+/* 상세 창 */
+dialog{border:0;padding:0;background:transparent;max-width:min(720px,calc(100vw - 24px));width:100%;max-height:calc(100dvh - 32px);color:var(--ink)}
+dialog::backdrop{background:rgb(0 0 0 / .5)}
+.sheet{background:var(--panel);border-radius:8px;padding:18px;overflow:auto;max-height:calc(100dvh - 32px)}
+.sheet h2{margin:0 0 4px;font-size:18px;line-height:1.4;overflow-wrap:anywhere}
+.sheet .sub{color:var(--muted);font-size:13px;margin-bottom:12px}
+.sheet .close{float:right;margin:-4px -4px 8px 8px;background:var(--panel);border:1px solid var(--line);border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:18px;line-height:1;position:relative;z-index:1}
+.sheet h4{margin:18px 0 6px;font-size:14px;font-weight:800}
+.sheet p{margin:0;font-size:13.5px;text-wrap:pretty}
+.dt-top{display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;margin-bottom:6px}
+.dt-top .info{display:flex;flex-direction:column;gap:6px;min-width:0}
+.dt-top .sub{margin:0}
+.dt-top .price{font-size:26px}
+.dt-top .acts{margin-top:4px}
+@media (max-width:560px){.dt-top{grid-template-columns:110px minmax(0,1fr);gap:12px}.dt-top .price{font-size:21px}.dt-top .acts{grid-column:1/-1}}
+.bars{display:flex;flex-direction:column;gap:6px}
+.hexc{margin-left:42px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.hexc h3{margin:0;font-size:15px}
+.hexc-svg{touch-action:none;cursor:pointer;max-width:380px}
+.hx-rows{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px 16px}
+.hx-row{display:grid;grid-template-columns:minmax(0,1fr) 34px 22px 34px;align-items:center;gap:4px;font-size:13px}
+.hx-row b{text-align:center}
+.hx-b{width:34px;height:34px;border:1px solid var(--rule);background:var(--panel);border-radius:6px;cursor:pointer;font-size:16px;line-height:1}
+.hx-b:disabled{opacity:.4;cursor:default}
+.hexmini .hex{max-width:300px}
+.hexmini .cov{text-align:center}
+@media (max-width:640px){.hexc{margin-left:0}}
+.hex{display:block;width:100%;max-width:420px;margin:0 auto;font-family:inherit}
+.bar{display:grid;grid-template-columns:112px minmax(0,1fr) 54px;gap:10px;align-items:center;font-size:12.5px}
+.bar .tr{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar .tr i{display:block;height:100%;background:var(--accent)}
+.bar .num{text-align:right;font-size:12px}
+.qtotal{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--ink);margin-top:8px;padding-top:6px;font-weight:800}
+
+/* 계산 방법 */
+details.method{margin-top:28px;padding:14px 16px}
+details.method summary{cursor:pointer;font-weight:800;font-size:15px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px;margin-top:14px;font-size:13.5px}
+.mgrid h4{margin:0 0 4px;font-size:13px}
+.mgrid p{margin:0;color:var(--muted);text-wrap:pretty}
+.wt{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+.wt th,.wt td{border-bottom:1px solid var(--line);padding:4px 6px;text-align:right}
+.wt th:first-child,.wt td:first-child{text-align:left}
+.tblwrap{overflow-x:auto}
+footer{margin-top:24px;font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.label{animation:rise .3s ease both}.label:nth-child(2){animation-delay:.04s}.label:nth-child(3){animation-delay:.08s}
+@keyframes rise{from{transform:translateY(6px)}to{transform:none}}}
+</style>
+
+<template id="shell">
+<div class="wrap">
+  <header class="top">
+    <div class="util"><div class="in">
+      <span>쿠팡 프로틴 랭킹 상위 <span class="n-all">100</span>개 비교 · 추천</span>
+      <div class="stamp"><span id="st-col"></span><span id="st-q"></span><span id="cov-stamp"></span></div>
+    </div></div>
+    <div class="in gnb">
+      <div class="brand">
+        <h1>맞춤 <span>프로틴</span></h1>
+        <p class="by">made by <b>헬과장</b></p>
+      </div>
+      <form class="sbar" id="sbar" role="search">
+        <input class="search" id="q-search" type="search" placeholder="상품명·브랜드·원료 검색 (예: WPI, 옵티멈, 완두)" aria-label="제품 검색">
+        <button class="sbtn" type="submit" aria-label="검색"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg></button>
+      </form>
+    </div>
+    <div class="in"><div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-all" aria-selected="true" aria-controls="view-all">전체 <span class="n-all">100</span>개 비교</button>
+      <button class="tab" role="tab" id="tab-rec" aria-selected="false" aria-controls="view-rec">맞춤 추천 <span class="tab-badge">초보 추천</span></button>
+    </div></div>
+  </header>
+
+  <div class="in">
+  <div class="intro">
+    <p>쿠팡 프로틴 랭킹 상위 <span class="n-all">100</span>개를 단백질 함량, 20g당 가격, 맛 평가, 품질 검증 정보로 비교해요. 처음이라면 ‘맞춤 추천’에서 질문에 답하고 추천을 받아 보세요.</p>
+    <p class="disc" id="disc" hidden>이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</p>
+  </div>
+
+
+  <section id="view-all" role="tabpanel" aria-labelledby="tab-all">
+    <button class="askbar" type="button" id="ask-go"><span class="ava" aria-hidden="true">헬</span><span><b>뭘 골라야 할지 모르겠다면?</b> 질문 몇 개에 답하면 헬과장이 골라드려요</span><span class="askgo">맞춤 추천 받기 ›</span></button>
+    <div class="cat-wrap">
+      <aside class="side box filters">
+        <div class="grp" id="f-cat"><span>종류</span></div>
+        <div class="grp" id="f-src"><span>주원료</span></div>
+        <div class="grp" id="f-flag"><span>조건</span></div>
+      </aside>
+      <div>
+        <div class="sortbar">
+          <div class="sorts" id="q-sort" role="group" aria-label="정렬">
+            <button class="sort" type="button" data-sort="r" aria-pressed="true">쿠팡 랭킹순</button>
+            <button class="sort" type="button" data-sort="p20" aria-pressed="false">20g당 낮은가격순</button>
+            <button class="sort" type="button" data-sort="scoop" aria-pressed="false">1스쿱당 낮은가격순</button>
+            <button class="sort" type="button" data-sort="price" aria-pressed="false">판매가 낮은순</button>
+            <button class="sort" type="button" data-sort="pct" aria-pressed="false">단백질 함량 높은순</button>
+            <button class="sort" type="button" data-sort="taste" aria-pressed="false">맛있어요순</button>
+            <button class="sort" type="button" data-sort="q" aria-pressed="false">품질 신뢰도순</button>
+          </div>
+          <div class="count" id="cat-count"></div>
+        </div>
+        <div class="list" id="catalog"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-rec" role="tabpanel" aria-labelledby="tab-rec" hidden>
+    <div class="rec">
+      <div class="chat box" id="quiz" aria-live="polite"></div>
+      <div id="results"></div>
+    </div>
+  </section>
+
+  <details class="method box" id="method">
+    <summary>추천 점수는 이렇게 계산해요</summary>
+    <div class="mgrid">
+      <div><h4>1. 조건으로 거르기</h4><p>우유·콩 알레르기, 유당, 식물성 조건은 라벨로 확인한 값만 씁니다. 우유·대두 알레르기는 함유가 ‘없음’으로 확인된 제품만 남기고, ‘같은 시설’·‘모름’·미확인 제품은 뺍니다. 원료 선호는 원재료에서 단백질 원료만 찾아 ‘동물성’(유청·카제인·우유단백·산양유 등만), ‘식물성’(대두·완두·쌀 등만), ‘복합성’(둘을 섞음)으로 나눕니다(크리머 안 카제인나트륨, 1순위가 아닌 탈지분유·유청분말, 대두 레시틴은 세지 않음). ‘식물성’은 원재료에 우유가 없는 제품(우유를 쓰는 시설에서 만든 제품 포함)만 남기며, 같은 시설 제조까지 피하려면 우유 알레르기를 함께 고르면 됩니다. 유당 조건은 ‘조금 불편해요’면 원재료 1순위(주원료)가 WPI(분리유청, 가수분해 분리유청 포함)인 제품, ‘아주 불편해요’면 그중 WPI가 원재료의 99% 이상으로 확인된 제품을 남기고, 두 경우 모두 원재료에 우유가 없는 식물성 제품(같은 시설 제조 포함)도 남깁니다(우유 알레르기나 식물성을 고르면 이미 우유가 빠져 이 조건은 쓰지 않음). 1회분 예산(판매가 × 1회 제공량 ÷ 총 중량, 1회 제공량은 제조사 기준이라 한 스쿱과 다를 수 있음)에 맞지 않는 제품도 빼고, 1회분 가격을 계산할 수 없는 제품은 예산을 고르면 뺍니다. 전체 비교 조건 필터의 ‘인공감미료 없음’은 원재료 전체에 수크랄로스·아세설팜칼륨·아스파탐·사카린이 없는 제품(스테비아·에리스리톨·알룰로스는 인공감미료로 보지 않음), ‘저당·저지방’은 1회 당류 1g 이하이면서 1회 지방 2g 이하이고, 값이 확인되지 않은 제품은 빠집니다. 게이너는 벌크업에서만 추천하고, 다른 목적에서는 ‘전체 <span class="n-all">100</span>개 비교’에서만 보여줍니다. 근육 키우기·취침 전에서는 식사대용 제품도 뺍니다.</p></div>
+      <div><h4>2. 여섯 가지 지표 비교</h4><p>단백질 함량, 20g당 가격, 맛, 품질 신뢰도, 인기도, 칼로리(같은 단백질 양에 칼로리가 적을수록 좋음, 벌크업은 1회 칼로리가 높을수록 좋음)를 <span class="n-all">100</span>개 안에서의 상대 위치(0~1)로 바꿉니다. 맛은 리뷰가 적을수록 평균 쪽으로 당겨서 리뷰 몇 개로 100%가 나온 제품이 과하게 앞서지 않게 합니다.</p></div>
+      <div><h4>3. 목적별 가중치</h4><p>목적마다 여섯 지표의 중요도를 슬라이더로 조절할 수 있고, 아래 표의 비율로 합산합니다. 조정한 값은 이 브라우저에 저장됩니다. 벌크업은 칼로리 지표를 1회 칼로리가 높을수록 좋게 보고, 취침 전은 주원료가 카제인이면 가점(우유단백은 조금 작게)을 줍니다. 원하는 맛이면 가점, 다른 맛이면 감점, ‘제품명 과장’(라벨 경고) 1건마다 감점, 쿠팡 판매 페이지에 영양정보·원재료표가 없거나 라벨 경고를 판정하지 못한 제품은 0.5건만큼 감점, 라벨 표기 문제는 감점 없이 표시만, 아미노산·콜라겐이 원재료 1~5순위에 단독 원료로 있으면 경고 1건으로 감점(복합원료 안에 있거나 6순위 이후, 표기된 함량상 소량이면 감점 없이 ‘소량’으로만 표시), 출처 등급 C·D는 소폭 감점합니다. 1회 단백질이 15g 미만인 제품은 점수에 넣지 않고 ‘확인할 점’으로만 알려줍니다.</p>
+        <div class="tblwrap"><table class="wt" id="wtable"></table></div></div>
+      <div><h4>4. 상위 3개 고르기</h4><p>마지막에 그린 ‘원하는 능력치’ 육각형을 제품 능력치가 얼마나 채우는지(충족도, 축마다 원하는 값까지만 셈)를 구해 위 점수와 반반으로 합친 값이 최종 적합도예요. 그 순서대로 고르되, 같은 제조원 제품은 상위 3개에 하나만 넣고 나머지는 ‘다음 후보’로 내립니다. 엑셀 ‘제조원’ 열 기준이며, 제조원을 확인하지 못한 제품은 서로 묶지 않습니다. 다음 후보에는 적합도와 가장 큰 추천 이유를 한 줄로 붙입니다.</p></div>
+      <div><h4>데이터 읽는 법</h4><p>단백질 함량은 질소량으로 계산하기 때문에, 따로 넣은 아미노산이나 콜라겐도 단백질로 잡혀요. 이런 원료가 들어간 제품은 실제 단백질이 표시보다 낮을 수 있어요. 총량의 ‘약 N회분’은 총 중량을 1회 제공량으로 나눈 값이고, 1회 제공량은 제조사가 정한 양이라 한 스쿱이 아닐 수 있어요. 품질 신뢰도는 공개 자료로 확인된 항목만 점수를 준 값이라, 낮은 점수가 품질이 나쁘다는 뜻은 아닙니다. 맛·알레르기·영양 정보는 라벨에서 확인한 값만 보여주고, 아직 확인하지 않은 제품은 ‘확인 안 됨’으로 표시합니다. 라벨 문제는 세 가지로 나눠요. ‘제품명 과장’은 제품명에 적힌 단백질(예: WPI, 아이솔레이트, 산양유)과 달리 다른 단백질이 섞이거나 앞 순위인 경우(제품명에 혼합·블렌드·복합·매트릭스를 밝혔거나, 이름이 ‘아이솔레이트’이고 섞인 단백질이 모두 분리 단백질이면 제외), ‘영양정보 미게시’는 쿠팡 판매 페이지에 정식 영양정보표나 원재료표가 없는 경우(다른 사이트 라벨로 보충한 제품 포함), ‘라벨 표기 문제’는 제품명의 숫자·단위·기준·홍보 문구가 라벨과 맞지 않는 경우예요. 주원료는 원재료 1순위이고, ‘주원료 99% 이상’은 원재료표에서 1순위 원료에 99% 이상이 적혀 있거나, 원료가 하나뿐이거나, 나머지 원료가 모두 % 표기되어 합이 1% 이하인 제품이에요(표기가 없으면 넣지 않음). 게이너·식사대용은 상품명(게이너는 단백질 30% 미만이면서 말토덱스트린 포함도)으로 나눕니다.</p></div>
+    </div>
+  </details>
+  <footer><span id="ft-src"></span><span id="ft-disc" hidden>이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>판매가·순위·리뷰는 수집 시점 값이며 계속 바뀝니다. 단백질 보충제는 의약품이 아니며, 질환이 있거나 식단 제한이 있다면 전문가와 상의하세요.</footer>
+  </div>
+</div>
+
+<dialog id="detail"><div class="sheet" id="sheet"></div></dialog>
+<dialog id="cmp" aria-labelledby="cmp-title"><div class="sheet wide" id="cmp-sheet"></div></dialog>
+<a class="fab" id="fab" href="#results" hidden>추천 결과 보기 <b id="fab-n"></b></a>
+<div class="tray" id="tray" hidden>
+  <div class="tray-in">
+    <span class="tray-k" id="tray-k">비교함</span>
+    <div class="tray-items" id="tray-items"></div>
+    <div class="tray-acts"><button class="btn pri" type="button" id="tray-go">비교하기</button><button class="btn" type="button" id="tray-clear">비우기</button></div>
+  </div>
+  <p class="tray-msg" id="tray-msg" aria-live="polite"></p>
+</div>
+</template>
+<div id="root"></div>
+
+<script src="data.js"></script>
+<script src="imgs.js"></script>
+<script id="app">
+(function(){
+document.getElementById('root').replaceChildren(document.getElementById('shell').content.cloneNode(true));
+/* 상품 데이터는 data.js(엑셀에서 생성), 사진은 imgs.js 에서 읽음 */
+const P = window.PP_DATA.products;
+const META = window.PP_DATA.meta;
+/* 상품 대표 사진 주소 (쿠팡 상품번호 → 이미지 URL). 엑셀 업로드와 별도로 유지 */
+const IMGS = window.PP_IMGS || {};
+const $ = s => document.querySelector(s);
+const won = v => v==null ? '확인 불가' : Math.round(v).toLocaleString('ko-KR')+'원';
+const pctS = v => v==null ? '확인 불가' : Math.round(v*100)+'%';
+const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const buyUrl = p => p.aff || p.url;
+const buyRel = p => p.aff ? 'sponsored noopener' : 'noopener';
+const ADDN = {amino:'아미노산', collagen:'콜라겐'};
+const gram = v => v==null ? '—' : v>=1000 ? `${+(v/1000).toFixed(v%1000?2:0)}kg` : `${v}g`;
+const sizeTxt = p => p.w ? `${gram(p.w)}${p.ss&&p.servings?` · 1회 ${p.ss}g 기준 약 ${p.servings}회분`:''}` : '확인 불가';
+function addNote(p, k){
+  const a = p.addv[k], n = ADDN[k];
+  const tail = k==='collagen' ? '콜라겐은 필수아미노산이 부족해, 근육에 쓰이는 단백질은 표시보다 적을 수 있음' : '아미노산도 단백질 수치에 잡혀서, 실제 단백질은 표시보다 낮을 수 있음';
+  const where = a.level==='warn' ? `${n} 첨가(원재료 ${a.pos}번째 ${a.name})` : a.why==='nested' ? `${n} 소량(복합원료 ${a.name} 안에 포함)` : `${n} 소량 첨가(원재료 ${a.pos}번째)`;
+  return `${where}: ${tail}`;
+}
+const val = v => v==null||v==='' ? '<span class="rk na">확인 안 됨</span>' : esc(v);
+const shortName = n => n.replace(/,\s*\d+(\.\d+)?\s*(kg|g|개|포|Pou\w*).*$/i,'').replace(/,\s*1개.*$/,'').trim();
+/* 상품 사진 대신: 통 모양에 맛 색, 주원료 이름 */
+const FLAVC = {'초코':'#6B4128','곡물·미숫가루':'#C9A06A','바닐라·밀크':'#EADBB8','커피':'#4A3424','말차·녹차':'#7FA35A','과일·디저트':'#EE8FA4','무맛':'#CFD3D8'};
+function thumb(p, badge){
+  const img = IMGS[p.pid];
+  const c = FLAVC[p.flav[0]] || '#9AA5B1';
+  const lab = {'유청(WPI)':'WPI','유청(WPC)':'WPC','완두·현미 등':'완두·현미','확인 불가':'원료 ?'}[p.src] || p.src;
+  return `<span class="thumb${img?' photo':''}" aria-hidden="true">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('noimg');this.remove()">`:''}<svg viewBox="0 0 60 80"><rect x="8" y="2" width="44" height="13" rx="3" fill="#2B2F36"/><rect x="4" y="13" width="52" height="65" rx="7" fill="${c}"/><rect x="4" y="34" width="52" height="24" fill="#fff" opacity=".92"/></svg><span class="th-lab">${esc(lab)}</span>${badge?`<span class="th-rk">${badge}</span>`:''}${p.cat!=='단백질 보충제'?`<span class="th-cat">${p.cat}</span>`:''}</span>`;
+}
+const rateHTML = p => p.rating==null ? `<span class="rate">평점 없음 (${p.rev.toLocaleString('ko-KR')})</span>` : `<span class="rate"><span class="stars" style="--r:${p.rating/5*100}%" aria-label="평점 ${p.rating}">★★★★★</span>(${p.rev.toLocaleString('ko-KR')})</span>`;
+const scoopTxt = p => `1스쿱 단백질 ${p.sp!=null?p.sp+'g':'확인 불가'}`;  /* 1스쿱 = 1회 제공량 */
+const priceHTML = p => `<span class="price">${p.price==null?'가격 확인 불가':Math.round(p.price).toLocaleString('ko-KR')+'<small>원</small>'+(p.servings?`<span class="sv">${p.servings}회분${p.perServ!=null?`(회당 ${won(p.perServ)})`:''}</span>`:'')}</span><span class="unit"><span class="nw">${scoopTxt(p)}</span><wbr><span class="nw">(20g당 ${won(p.p20)})</span></span>`;
+
+/* ---------- 아미노산·콜라겐 첨가 판정 (원재료 전체의 순서와 표기 %만 사용) ---------- */
+function topItems(s){
+  const out=[]; let depth=0, cur='';
+  for(const ch of s){
+    if('([{（［'.includes(ch)) depth++;
+    if(')]}）］'.includes(ch)) depth=Math.max(0,depth-1);
+    if((ch===','||ch==='，') && depth===0){ if(cur.trim()) out.push(cur.trim()); cur=''; } else cur+=ch;
+  }
+  if(cur.trim()) out.push(cur.trim());
+  return out;
+}
+const AMINO_RX = /아미노산|아미노믹스|BCAA|EAA|이에이에이|비씨에이에이|L-?로이신|L-?류신|L-?이소류신|L-?발린|글루타민(?!산)|글리신|타우린|크레아틴|아르기닌|[Aa]mino [Aa]cid|[Gg]lycine|[Tt]aurine|[Ll]-?[Ll]eucine|[Gg]lutamine|[Cc]reatine|[Aa]rginine/;
+const COLL_RX = /콜라겐|젤라틴|[Cc]ollagen|[Gg]elatin/;
+const headOf = t => t.split(/[([{（［]/)[0].trim();
+const pctOf = t => { const m = t.match(/(\d+(?:\.\d+)?)\s*%/); const v = m ? +m[1] : null; return v!=null && v<=100 ? v : null; };
+function findAdd(items, rx){
+  const i = items.findIndex(t=>rx.test(t)); if(i<0) return null;
+  const t = items[i], head = headOf(t), own = rx.test(head) && !/유청|대두|산양유|초유|우유|[Ww]hey|[Ss]oy/.test(head);  /* 단백질 복합원료 이름에 섞인 경우는 복합원료로 봄 */
+  const before = items.slice(0,i).map(pctOf), sumBefore = before.every(v=>v!=null) && before.length ? before.reduce((a,b)=>a+b,0) : null;
+  const ownPct = own ? pctOf(t) : null;
+  let level = 'info', why = 'late';
+  if(!own){ why = 'nested'; }
+  else if(/less than 2%|2% 미만/i.test(items.slice(0,i+1).join(','))){ why = 'lt2'; }
+  else if(ownPct!=null && ownPct<5){ why = 'pct'; }
+  else if(sumBefore!=null && sumBefore>=95){ why = 'rest'; }
+  else if(i+1<=5){ level = 'warn'; why = 'top5'; }
+  return {pos:i+1, name:(own?head:headOf(t)).slice(0,24), level, why};
+}
+function additives(p){
+  const src = p.ingFull || p.ing || ''; if(!src) return null;
+  const items = topItems(src);
+  return {amino: findAdd(items, AMINO_RX), collagen: findAdd(items, COLL_RX), full: !!p.ingFull};
+}
+
+/* ---------- 주원료 99% 이상 판정 (원재료 전체에 적힌 순서와 % 표기만 사용) ---------- */
+function share99(p){
+  if(!p.ingFull || p.unchk) return false;  /* 원재료표가 아닌 문구(판정 불가)는 제외 */
+  const s = p.ingFull.replace(/[、／]/g, ',');
+  let d = 0; for(const ch of s){ if('([{（［'.includes(ch)) d++; if(')]}）］'.includes(ch)) d--; if(d<0) return false; }
+  if(d!==0) return false;  /* 괄호가 맞지 않으면 원재료 경계를 알 수 없음 */
+  const items = topItems(s); if(!items.length) return false;
+  let first = items[0], prev; do { prev = first; first = first.replace(/[([{（［][^()[\]{}（）［］]*[)\]}）］]/g, ' '); } while(first!==prev);
+  const own = pctOf(first);
+  if(own!=null && own>=99) return true;                                   /* 1순위 원료 자체에 99% 이상 표기 */
+  if(items.length===1) return !/[,，]/.test(items[0]);                     /* 원료가 하나뿐 (괄호 안이 원산지 등일 때만) */
+  const rest = items.slice(1).map(pctOf);
+  return rest.every(v=>v!=null) && rest.reduce((a,b)=>a+b,0)<=1;           /* 나머지 원료가 모두 % 표기되고 합이 1% 이하 */
+}
+/* ---------- 단백질 원료 유형 (조사 명세 5-6): 원재료 전체에서 단백질 원료만 찾아 동물성·식물성·복합으로 나눔 ---------- */
+const PT = [['WPH',/가수분해\s*(분리)?\s*유청|hydrolyz\w*\s+whey|\bWPH\b/i,'a'],['WPI',/분리\s*유청|\bWPI\b|whey\s+protein\s+isolate/i,'a'],['WPC',/농축\s*유청|\bWPC\b|whey\s+protein\s+concentrate|유청단백농축|ホエイたんぱく濃縮/i,'a'],
+  ['MPI',/분리\s*우?유단백|\bMPI\b|milk\s+protein\s+isolate/i,'a'],['MPC',/농축\s*우유단백|\bMPC\b|milk\s+protein\s+concentrate/i,'a'],['카제인',/카[제세]인|casein|カゼイン/i,'a'],
+  ['산양유단백',/산양유/,'a'],['난백',/난백|egg\s*white|卵白/i,'a'],['유청',/유청\s*단백|whey|ホエイ/i,'a'],['우유단백',/우유\s*단백|유단백|milk\s+protein|乳(蛋白|たんぱく|タンパク)/i,'a'],
+  ['ISP',/대두\s*단백|\bISP\b|soy\s+protein|大豆(蛋白|たんぱく|タンパク)/i,'p'],['PPI',/완두\s*단백|\bPPI\b|pea\s+protein|えんどう(豆)?(蛋白|たんぱく|タンパク)/i,'p'],['쌀단백질',/쌀\s*단백|현미\s*단백|rice\s+protein/i,'p'],['밀단백',/밀\s*단백|wheat\s+protein/i,'p']];
+const PT_FIRST = [['유청',/유청분말/,'a'],['우유단백',/탈지분유|전지분유/,'a']];  /* 1순위일 때만 셈 */
+const NOT_PROT = /^(혼합)?(탈지분유|전지분유|유청분말)$|레시틴|lecithin/i;  /* 단백질 원료로 세지 않음 (1순위 제외) */
+const BLEND_HEAD = /프로틴|단백|protein|블렌드|블랜드|컴플렉스|콤플렉스|매트릭스|blend|matrix|complex/i;
+const ptOf = (t, first) => { const h = headOf(t).trim(); if(!first && NOT_PROT.test(h)) return null; return PT.find(([,rx])=>rx.test(t)) || (first && PT_FIRST.find(([,rx])=>rx.test(h))) || null; };
+const toks = s => s.split(/[,，、()[\]{}（）［］]/).map(x=>x.trim()).filter(Boolean);
+function protTypes(p){
+  const raw = p.ingFull || p.ing || '';  /* 원재료 전체가 없으면 '단백질 종류'(원재료 앞 3개) */
+  if(!raw || /^확인 불가/.test(raw)) return null;
+  const src = raw.replace(/^\s*[([（［][^()（）[\]［］]*[)\]）］]\s*/, '');  /* 앞에 붙은 '(라벨 설명)' 메모는 뺌 */
+  let d = 0; for(const ch of src){ if('([{（［'.includes(ch)) d++; if(')]}）］'.includes(ch)) d--; }
+  const found = [];
+  if(d!==0) toks(src).forEach((u,i)=>{ const x = ptOf(u, i===0); if(x) found.push(x); });  /* 괄호가 맞지 않으면 낱말 단위로 찾음 */
+  else topItems(src).forEach((t,i)=>{
+    const head = headOf(t), inner = t.slice(head.length);
+    if(BLEND_HEAD.test(head) && !/크리머|creamer|크림/i.test(head) && toks(inner).some(u=>ptOf(u))){ toks(inner).forEach(u=>{ const x = ptOf(u); if(x) found.push(x); }); return; }  /* 단백질 블렌드는 괄호 안 단백 원료를 셈 */
+    const x = ptOf(head, i===0);
+    if(x){ const y = ptOf(t, i===0); found.push(y && y[2]===x[2] && ['유청','우유단백'].includes(x[0]) ? y : x); }  /* 괄호 안 유형 표기(WPC 등)가 있으면 그것을 씀 */
+  });
+  const names = [...new Set(found.map(x=>x[0]))], kinds = new Set(found.map(x=>x[2]));
+  if(!names.length) return null;
+  const uniq = [...new Map(found.map(x=>[x[0],x])).values()], share = {a: uniq.filter(x=>x[2]==='a').length/uniq.length, p: uniq.filter(x=>x[2]==='p').length/uniq.length};  /* 단백 원료 종류 수 기준 비율 */
+  return {names, kind: kinds.size>1 ? '복합' : kinds.has('p') ? '식물성' : '동물성', first: found[0][2], share};
+}
+/* 유당 조건: 조금 불편 = 원재료 1순위(주원료)가 WPI, 아주 불편 = 주원료 WPI이면서 원재료의 99% 이상. 우유 알레르기·식물성 선택 시엔 이미 우유가 없어 쓰지 않음 */
+const BLEND_RX = /혼합|블렌드|블랜드|복합|매트릭스|[Bb]lend|[Mm]atrix/;  /* '믹스'(드링크 믹스)·'웨이'(유청)는 혼합 표시가 아님 */
+/* 추가 조건 (시트 값에 대한 고정 규칙). 값을 확인할 수 없으면 조건을 통과하지 않음 */
+const SWEET_RX = /수크랄로스|아세설팜|아스파탐|사카린|[Ss]ucralose|[Aa]cesulfame|[Aa]spartame|[Ss]accharin|スクラロース|アセスルファム|アスパルテーム|サッカリン/;
+const EXTF = {
+  nosweet: p=>!!p.ingFull && !p.unchk && !SWEET_RX.test(p.ingFull),  /* 원재료 전체에 인공감미료 4종이 없음 (스테비아·에리스리톨·알룰로스는 제외 대상 아님) */
+  lowsugar: p=>p.sugar!=null && p.sugar<=1 && p.fat!=null && p.fat<=2,  /* 저당·저지방: 1회 당류 1g 이하 + 1회 지방 2g 이하 */
+  main99: p=>!!p.main99,
+};
+const EXTN = {nosweet:'인공감미료 없음', lowsugar:'저당·저지방', main99:'주원료 99% 이상'};
+const ptKind = p => p.ptype ? p.ptype.kind : null;
+const isPlant = p => ptKind(p)==='식물성' && (p.milk==='없음' || p.milk==='같은 시설');  /* 식물성 단백질만 + 원재료에 우유 없음 */
+const noMilkPlant = p => (p.src==='대두' || p.src==='완두·현미 등' || p.milk==='없음') && (p.milk==='없음' || p.milk==='같은 시설');  /* 원재료에 우유가 없는 식물성 (같은 시설 제조는 유당과 무관해 포함) */
+function lacOK(p, lv){ if(noMilkPlant(p)) return true; if(p.src!=='유청(WPI)') return false; return lv==='very' ? !!p.main99 : true; }
+function lacOn(){ return A.lac!=='ok' && !A.alg.includes('milk') && A.src!=='plant'; }
+/* ---------- metrics (relative position among all 100) ---------- */
+function prank(key, higherBetter){
+  const vals = P.filter(p=>p[key]!=null).map(p=>p[key]).sort((a,b)=>a-b);
+  const n = vals.length;
+  return v => { if(v==null) return null; let lo=0; while(lo<n && vals[lo]<v) lo++; let hi=lo; while(hi<n && vals[hi]===v) hi++;
+    const r = ((lo+hi-1)/2)/(n-1); return higherBetter ? r : 1-r; };
+}
+const tasteMean = (()=>{const t=P.filter(p=>p.taste!=null); return t.reduce((s,p)=>s+p.taste,0)/t.length;})();
+P.forEach(p=>{ p.tb = p.taste==null ? null : (p.taste*p.rev + tasteMean*80)/(p.rev+80); p.lrev = Math.log10(p.rev+1);
+  p.kpg = p.kcal!=null && p.sp ? p.kcal/p.sp : null; });  /* 단백질 1g당 칼로리 (같은 영양정보 표의 1회 칼로리 ÷ 1회 단백질) */
+const RMAX = Math.max(...P.map(p=>p.r));
+const R = { dens:prank('pct',true), value:prank('p20',false), taste:prank('tb',true), lrev:prank('lrev',true), kcal:prank('kpg',false), kcalHi:prank('kcal',true) };
+P.forEach(p=>{
+  p.m = {
+    dens: R.dens(p.pct),
+    value: R.value(p.p20),
+    taste: R.taste(p.tb),
+    trust: Math.min(1, p.q/70),
+    pop: 0.5*R.lrev(p.lrev) + 0.5*(1-(p.r-1)/Math.max(1, RMAX-1)),
+    kcal: R.kcal(p.kpg),
+    kcalHi: R.kcalHi(p.kcal)  /* 벌크업용: 1회 칼로리가 높을수록 */
+  };
+  p.cert3 = /Informed/.test(p.cert);
+  p.unchk = /확인 안 함|라벨 미확인|판정 불가/.test(p.warn) || !p.warn;  /* 라벨 경고 검사를 하지 않은 제품 */
+  /* 라벨 구분 (시트 값 그대로): 제품명 과장 = AE·AF 라벨 경고(제품명과 구성 불일치), 영양정보 미게시 = AW열, 라벨 표기 문제 = AX열 */
+  p.mix = p.wn>0 && !BLEND_RX.test(p.n);  /* 제품명에 혼합·블렌드 등을 밝혔으면 섞여 있어도 차이로 보지 않음 */
+  p.ptype = protTypes(p);  /* 동물성·식물성·복합 (원료 선호 질문용) */
+  p.main99 = share99(p);  /* 원료 1순위가 제품의 99% 이상 */
+  p.nopost = p.nopost || null; p.lblx = p.lblx || null;
+  p.short = shortName(p.n);
+  p.pid = ((p.url||'').match(/\/products\/(\d+)/)||[])[1] || null;
+  p.addv = additives(p);
+  p.addWarn = ['amino','collagen'].filter(k=>p.addv && p.addv[k] && p.addv[k].level==='warn');
+  p.addInfo = ['amino','collagen'].filter(k=>p.addv && p.addv[k] && p.addv[k].level!=='warn');
+  p.servings = p.w && p.ss ? Math.floor(p.w/p.ss) : null;
+  p.perServ = p.price && p.w && p.ss ? p.price*p.ss/p.w : null;  /* 1회 제공량 1번 먹는 데 드는 값 */
+  if(p.mk==='확인 불가') p.mk='제조원 미확인';
+});
+
+/* ---------- 육각형 능력치 (1~5, 높을수록 좋음). 엑셀에서 확인한 값만 쓰고, 값이 없으면 그 축은 '확인 안 됨' ---------- */
+const ingCount = p => p.ingFull && !p.unchk ? topItems(p.ingFull.replace(/^\s*[([（［][^()（）[\]［］]*[)\]）］]\s*/, '')).length : null;
+P.forEach(p=>{ p.ingN = ingCount(p); });
+const R_ING2 = (()=>{ const vals = P.map(p=>p.ingN).filter(v=>v!=null).sort((a,b)=>a-b), n = vals.length;
+  return v => { if(v==null) return null; let lo=0; while(lo<n && vals[lo]<v) lo++; let hi=lo; while(hi<n && vals[hi]===v) hi++; return 1-((lo+hi-1)/2)/(n-1); }; })();
+const to5 = v => v==null ? null : Math.round((1+4*v)*10)/10;
+const clamp5 = v => Math.max(1, Math.min(5, v));
+function hexStats(p, pref, full){
+  const lac = p.milk==='없음' || p.milk==='같은 시설' ? 5 : p.lacfree==='있음' || (p.src==='유청(WPI)' && p.main99) ? 4 : p.src==='유청(WPI)' ? 3 : p.milk==='있음' ? 2 : null;
+  let add = to5(R_ING2(p.ingN)); if(add!=null){ if(p.ingFull && SWEET_RX.test(p.ingFull)) add -= 1; add -= p.addWarn.length; add = clamp5(Math.round(add*10)/10); }
+  const f = pref || (p.ptype ? p.ptype.first : 'a');  /* 원하는 원료 쪽(맞춤 추천에서 동물성·식물성을 고른 경우) 또는 제품의 첫 단백 원료 쪽 */
+  const kindLab = f==='p' ? '식물성 함유' : '동물성 함유';
+  const kindV = !p.ptype ? null : Math.round((1 + 4*p.ptype.share[f])*10)/10;  /* 한쪽만 쓰면 5, 반대쪽만 쓰면 1 */
+  const out = [['유당 부담 적음', lac], ['가격', to5(p.m.value)], ['맛', to5(p.m.taste)], ['품질', to5(p.m.trust)], ['첨가물 적음', add], [kindLab, kindV]];
+  if(full) out.push(['단백질 함량', to5(p.m.dens)], ['인기', to5(p.m.pop)], A.goal==='bulk' ? ['칼로리 높음', to5(p.m.kcalHi)] : ['칼로리 적음', to5(p.m.kcal)]);  /* 맞춤 추천용 9축: 세부 조정의 지표 추가 */
+  return out;
+}
+const HX = {cx:150, cy:128, R:84};
+const hxAng = (i, n=6) => -Math.PI/2 + i*2*Math.PI/n;
+const hxPt = (i, r, n=6) => [HX.cx + r*Math.cos(hxAng(i,n)), HX.cy + r*Math.sin(hxAng(i,n))];
+const hxPts = vals => vals.map((v,i)=>hxPt(i, HX.R*(v||0)/5, vals.length).map(n=>n.toFixed(1)).join(',')).join(' ');
+function hexGrid(n=6){
+  return [1,2,3,4,5].map(k=>`<polygon points="${hxPts(Array(n).fill(k))}" fill="none" stroke="var(--line)" stroke-width="${k===5?1.5:1}"/>`).join('')
+    + [...Array(n).keys()].map(i=>{ const [x,y] = hxPt(i,HX.R,n); return `<line x1="${HX.cx}" y1="${HX.cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)"/>`; }).join('');
+}
+function hexLabels(labs, vals, color){
+  return labs.map((l,i)=>{ const [x,y] = hxPt(i, HX.R+26, labs.length), anc = Math.abs(x-HX.cx)<5 ? 'middle' : x<HX.cx ? 'end' : 'start', v = vals[i];
+    return `<text x="${x.toFixed(1)}" y="${y.toFixed(1)}" text-anchor="${anc}" font-size="12.5" font-weight="700" fill="var(--ink)">${l}</text><text x="${x.toFixed(1)}" y="${(y+15).toFixed(1)}" text-anchor="${anc}" font-size="12" fill="${v==null?'var(--muted)':color}" font-weight="700">${v==null?'확인 안 됨':(+v).toFixed(v%1?1:0)}</text>`; }).join('');
+}
+/* opt.pref: 원하는 원료 쪽, opt.target: 원하는 능력치(점선으로 겹쳐 그림) */
+function hexSVG(p, opt){
+  opt = opt || {};
+  const st = hexStats(p, opt.pref, opt.full), vals = st.map(x=>x[1]), n = vals.length;
+  const dots = vals.map((v,i)=>{ if(v==null) return ''; const [x,y] = hxPt(i, HX.R*v/5, n); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="var(--panel)" stroke="var(--accent)" stroke-width="2"/>`; }).join('');
+  const tgt = opt.target ? `<polygon points="${hxPts(opt.target)}" fill="none" stroke="var(--warn)" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round"/>` : '';
+  return `<svg class="hex" viewBox="-30 0 360 262" role="img" aria-label="${esc(st.map(([l,v])=>`${l} ${v==null?'확인 안 됨':v.toFixed(1)}`).join(', '))}">${hexGrid(n)}<polygon points="${hxPts(vals)}" fill="var(--accent)" fill-opacity=".22" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>${tgt}${dots}${hexLabels(st.map(x=>x[0]), vals, 'var(--accent)')}</svg>`;
+}
+const HEXNOTE = '5점 만점, 높을수록 좋아요. 가격·맛·품질은 전체 제품 안에서의 상대 위치, 유당은 원재료·락토프리 표기, 첨가물은 원재료 개수(적을수록 높음)에서 인공감미료·첨가 경고마다 1점씩 뺀 값, 함유 정도는 단백질 원료 중 그 쪽 원료가 차지하는 개수 비율이에요(한쪽만 쓰면 5).';
+
+/* ---------- quiz ---------- */
+const Q = [
+  {id:'alg', t:'우유나 콩(대두) 알레르기가 있나요?', multi:true, opts:[['none','없어요'],['milk','우유'],['soy','콩(대두)']]},
+  {id:'goal', t:'목적', cls:'goal', opts:[
+    ['muscle','근육 키우기','운동 후 단백질 보충'],['diet','체중 관리','칼로리 대비 단백질'],['bulk','벌크업','칼로리 높게, 게이너 포함'],['night','취침 전','천천히 흡수되는 카제인 우선']]},
+  {id:'lac', t:'우유를 마시면 속이 불편한가요?', opts:[['ok','괜찮아요'],['little','조금 불편해요','주원료 WPI 또는 식물성'],['very','아주 불편해요','WPI 99% 이상 또는 식물성']]},
+  {id:'src', t:'원료 선호', opts:[['any','상관없음'],['animal','동물성','유청·카제인 등 동물성 단백질만'],['plant','식물성','대두·완두 등 식물성 단백질만, 우유 없음'],['mix','복합성','동물성과 식물성 단백질을 섞은 제품']]},
+  {id:'flav', t:'좋아하는 맛', opts:[['any','상관없음'],['초코','초코'],['곡물·미숫가루','곡물·미숫가루'],['바닐라·밀크','바닐라·밀크'],['커피','커피'],['과일·디저트','과일·디저트'],['무맛','무맛(요리·스무디용)']]},
+  {id:'bud', t:'1회분 예산', opts:[['0','상관없음'],['1000','1,000원 이하'],['1500','1,500원 이하'],['2000','2,000원 이하'],['3000','3,000원 이하']]},
+  {id:'qual', t:'품질은 얼마나 따지나요?', opts:[['low','크게 상관없어요','가격·맛 위주로'],['mid','어느 정도 봐요','보통'],['high','꼭 중요해요','인증·성적서 공개 제품 우선']]},
+  {id:'weights'}
+];
+const ML = {dens:'단백질 함량',value:'가성비',taste:'맛',trust:'품질 신뢰도',pop:'인기',kcal:'칼로리'};
+const GOALN = {muscle:'근육 키우기',diet:'체중 관리',bulk:'벌크업',night:'취침 전'};
+const DEF = {alg:[],goal:'muscle',lac:'ok',src:'any',flav:'any',bud:'0',ext:[],qual:'mid'};
+/* 목적별 기본 중요도 (0~10). 실제 반영 비율 = 각 값 ÷ 합계 */
+const DW = {
+  muscle:{dens:5,value:5,taste:4,trust:3,pop:3,kcal:0},
+  diet:  {dens:8,value:3,taste:4,trust:2,pop:3,kcal:6},
+  bulk:  {dens:2,value:5,taste:4,trust:2,pop:3,kcal:6},  /* 벌크업의 칼로리는 1회 칼로리가 높을수록 좋게 봄 */
+  night: {dens:5,value:4,taste:4,trust:3,pop:3,kcal:2}
+};
+const clone = o => JSON.parse(JSON.stringify(o));
+let A = clone(DEF), CW = clone(DW);
+try{ const s = JSON.parse(localStorage.getItem('ppick-answers')||'null'); if(s) A = Object.assign(clone(DEF), s); if(A.lac==='sens') A.lac = 'little'; if(!['0','1000','1500','2000','3000'].includes(String(A.bud))) A.bud = '0'; A.src = {whey:'animal', nosoy:'any'}[A.src] || A.src; if(!['any','animal','plant','mix'].includes(A.src)) A.src = 'any'; if(!['low','mid','high'].includes(A.qual)) A.qual = 'mid'; if(Array.isArray(A.ext)) A.ext = A.ext.filter(k=>k!=='small'); }catch(e){}  /* 예전 '불편해요' 답은 '조금 불편해요'로 */
+try{ const s = JSON.parse(localStorage.getItem('ppick-weights')||'null');
+  if(s) for(const g in DW) for(const k in DW[g]) if(s[g] && Number.isFinite(+s[g][k])) CW[g][k] = Math.max(0, Math.min(10, +s[g][k])); }catch(e){}
+if(!GOALN[A.goal]) A.goal = 'muscle';
+A.ext = [];  /* 추가 조건 질문 삭제(2026-11-01): 예전 답은 쓰지 않음 */
+delete A.pri;
+if(!Array.isArray(A.alg)) A.alg = [];
+const ALGNOTE = '<p class="algnote">라벨에서 해당 성분이 ‘없음’으로 확인된 제품만 남겨요. 같은 시설에서 만든 제품과 아직 확인하지 않은 제품은 뺐어요. 구매 전 상세페이지의 알레르기 표시를 한 번 더 확인하세요.</p>';
+const known = v => v!=null && v!=='모름';
+const COV = {
+  milk: P.filter(p=>known(p.milk)).length, soy: P.filter(p=>known(p.soy)).length,
+  lacLittle: P.filter(p=>lacOK(p,'little')&&!noMilkPlant(p)).length, lacVery: P.filter(p=>lacOK(p,'very')&&!noMilkPlant(p)).length, lacPlant: P.filter(noMilkPlant).length, flav: P.filter(p=>p.flavText).length,
+  any: P.filter(p=>p.checked || p.flavText || p.ingFull || known(p.milk) || known(p.soy) || p.kcal!=null).length
+};
+const covNote = t => `<p class="cov">${t}</p>`;
+
+function share(g){
+  const w = CW[g], s = Object.values(w).reduce((a,b)=>a+b,0), out = {};
+  for(const k in w) out[k] = s ? w[k]/s : 1/Object.keys(w).length;
+  return out;
+}
+function isDefaultW(g){ return Object.keys(DW[g]).every(k=>DW[g][k]===CW[g][k]); }
+function weightPanel(step){
+  const sh = share(A.goal);
+  return `<div class="q wpanel"><h3><span class="step">${step}</span>${GOALN[A.goal]} 가중치</h3>
+    <p class="wnote">마지막으로 무엇을 중요하게 볼지 조절하세요. 중요도는 0~10이고, 오른쪽은 점수에 실제로 반영되는 비율이에요. 움직이면 결과가 바로 바뀌어요.</p>
+    <div class="wrows">${Object.keys(ML).map(k=>`<label class="wrow" for="w-${k}"><span>${k==='kcal'&&A.goal==='bulk'?'칼로리(높게)':ML[k]}</span>
+      <input type="range" id="w-${k}" data-w="${k}" min="0" max="10" step="1" value="${CW[A.goal][k]}" aria-valuetext="${CW[A.goal][k]}">
+      <b class="num" id="wv-${k}">${Math.round(sh[k]*100)}%</b></label>`).join('')}</div>
+    <button class="reset" type="button" id="w-reset"${isDefaultW(A.goal)?' hidden':''}>${GOALN[A.goal]} 기본값으로</button></div>`;
+}
+/* 대화형 맞춤 추천: 질문을 하나씩 묻고, 답은 말풍선으로 남김 (답을 누르면 다시 고를 수 있음) */
+const BOT = {alg:'먼저, 우유나 콩(대두) 알레르기가 있나요? 있으면 모두 골라 주세요.', goal:'프로틴을 먹는 목적이 뭔가요?', lac:'우유를 마시면 속이 불편한 편인가요?',
+  src:'원하는 단백질 원료가 있나요? 잘 모르겠으면 ‘상관없음’을 고르면 돼요.', flav:'좋아하는 맛을 골라 주세요.', bud:'한 번 먹을 때(1회분) 예산은 어느 정도인가요?',
+  ext:'꼭 필요한 조건이 있으면 골라 주세요. 없으면 다음으로 넘어가요.',
+  qual:'마지막 질문이에요. 품질은 얼마나 따지나요? 품질 신뢰도는 제3자 인증·성적서처럼 공개 자료로 확인된 정도예요.'};
+const DONE = Q.findIndex(q=>q.id==='weights');
+/* 챗봇 선택지 아이콘·설명 (화면 표시용) */
+const ICO = {alg:{none:['🙆','알레르기 없음'],milk:['🥛','유제품 빼기'],soy:['🫘','대두 빼기']},
+  goal:{muscle:['💪'],diet:['⚖️'],bulk:['🍚'],night:['🌙']},
+  lac:{ok:['😊','우유 마셔도 괜찮음'],little:['😐'],very:['😣']},
+  src:{any:['👌','원료는 상관없음'],animal:['🥛'],plant:['🌱'],mix:['🔀']},
+  flav:{any:['🎲','맛은 상관없음'],'초코':['🍫'],'곡물·미숫가루':['🌾'],'바닐라·밀크':['🍦'],'커피':['☕'],'과일·디저트':['🍓'],'무맛':['🥄']},
+  bud:{'0':['💰','예산 상관없음'],'1000':['🪙','아주 저렴하게'],'1500':['🪙'],'2000':['💵'],'3000':['💵']},
+  qual:{low:['🙂'],mid:['👍'],high:['🏅']},
+  ext:{cert:['🏅','외부 기관 검증'],nowarn:['✅','라벨 문제 없는 제품'],single:['📦','묶음 상품 빼기'],nosweet:['🍃','수크랄로스 등 없음'],lowsugar:['🧂'],main99:['💯','섞지 않은 원료']}};
+let STEP = 0, EDIT = false, WOPEN = false;
+try{ const c = localStorage.getItem('ppick-chat'); STEP = c!=null ? Math.max(0, Math.min(DONE, +c||0)) : (localStorage.getItem('ppick-answers') ? DONE : 0); }catch(e){}
+const skipQ = i => Q[i] && Q[i].id==='lac' && A.alg.includes('milk');
+const nextStep = i => { let j = i+1; while(j<DONE && skipQ(j)) j++; return j; };
+function ansText(q){
+  const lab = v => (q.opts.find(o=>o[0]===v)||[,v])[1];
+  if(q.multi) return A[q.id].length ? A[q.id].map(lab).join(', ') : '없어요';
+  return lab(A[q.id]);
+}
+const botMsg = (html, extra) => `<div class="msg bot"><span class="ava" aria-hidden="true">헬</span><div class="bub">${html}</div></div>${extra||''}`;
+/* ---------- 원하는 능력치 (육각형 커스텀): 0~5. 제품 능력치가 이 모양을 얼마나 채우는지(충족도)를 점수와 반반 합쳐 최종 순위 ---------- */
+const HK = ['lac','price','taste','qual','add','kind','dens','pop','kcal'];
+function hexDefault(){
+  return {lac: {ok:1, little:3, very:5}[A.lac] ?? 1, price: +A.bud ? 4 : 3, taste: A.flav!=='any' ? 4 : 3,
+    qual: {low:1, mid:3, high:5}[A.qual] ?? 3, add: A.ext.includes('nosweet') || A.ext.includes('nowarn') ? 4 : 2, kind: A.src==='animal' || A.src==='plant' ? 4 : 0,
+    dens: Math.round(CW[A.goal].dens/2), pop: Math.round(CW[A.goal].pop/2), kcal: Math.round(CW[A.goal].kcal/2)};  /* 세부 조정(가중치 0~10)의 절반 */
+}
+let HXS = {edited:false, v:null};
+try{ const s = JSON.parse(localStorage.getItem('ppick-hex')||'null'); if(s && s.edited && s.v){ const d = hexDefault(); HXS = {edited:true, v:Object.fromEntries(HK.map(k=>[k, Number.isFinite(+s.v[k]) ? Math.max(0, Math.min(5, Math.round(+s.v[k]))) : d[k]]))}; } }catch(e){}
+const curHW = () => HXS.edited ? HXS.v : hexDefault();
+const hexPref = () => A.src==='plant' ? 'p' : A.src==='animal' ? 'a' : null;
+const hexTarget = () => HK.map(k=>curHW()[k]);
+function hexFit(p){
+  const t = hexTarget(), sum = t.reduce((a,b)=>a+b,0); if(!sum) return null;
+  const v = hexStats(p, hexPref(), true).map(x=>x[1]);
+  return t.reduce((a,ti,i)=>a + Math.min(v[i]==null ? 1.5 : v[i], ti), 0) / sum;  /* 값이 없으면 1.5점으로 봄 */
+}
+function saveHex(){ try{ localStorage.setItem('ppick-hex', JSON.stringify(HXS)); }catch(e){} }
+function setHex(k, val){ HXS = {edited:true, v:Object.assign({}, curHW(), {[k]: Math.max(0, Math.min(5, val))})}; saveHex(); drawHexC(); renderResults(); }
+function hexCustomHTML(){
+  const hw = curHW(), t = hexTarget(), labs = ['유당 부담 적음','가격','맛','품질','첨가물 적음', A.src==='plant' ? '식물성 함유' : '동물성 함유', '단백질 함량', '인기', A.goal==='bulk' ? '칼로리 높음' : '칼로리 적음'], n = HK.length;
+  const handles = t.map((v,i)=>{ const [x,y] = hxPt(i, HX.R*v/5, n); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="var(--warn)" stroke="var(--panel)" stroke-width="2"/>`; }).join('');
+  return `<h3>마지막으로, 원하는 능력치를 그려 주세요</h3>
+    <p class="wnote">답변과 세부 조정을 바탕으로 모양을 미리 그려 뒀어요. 꼭짓점을 끌거나 아래 −/＋로 바꾸면 추천이 바로 바뀌어요. 이 모양을 많이 채우는 제품일수록 위로 올라가요(0이면 그 능력치는 보지 않음).</p>
+    <svg class="hex hexc-svg" id="hexc-svg" viewBox="-30 0 360 262" role="img" aria-label="원하는 능력치: ${esc(labs.map((l,i)=>`${l} ${t[i]}`).join(', '))}">${hexGrid(n)}<polygon points="${hxPts(t)}" fill="var(--warn)" fill-opacity=".14" stroke="var(--warn)" stroke-width="2" stroke-dasharray="5 4" stroke-linejoin="round"/>${handles}${hexLabels(labs, t, 'var(--warn)')}</svg>
+    <div class="hx-rows">${HK.map((k,i)=>`<div class="hx-row"><span>${labs[i]}</span><button type="button" class="hx-b" data-hx="${k}" data-d="-1" aria-label="${labs[i]} 낮추기"${hw[k]<=0?' disabled':''}>−</button><b class="num">${hw[k]}</b><button type="button" class="hx-b" data-hx="${k}" data-d="1" aria-label="${labs[i]} 높이기"${hw[k]>=5?' disabled':''}>＋</button></div>`).join('')}</div>
+    ${HXS.edited?'<button class="reset" type="button" id="hx-reset">답변 기준으로 되돌리기</button>':''}`;
+}
+function drawHexC(){ const c = document.getElementById('hexc'); if(c) c.innerHTML = hexCustomHTML(); }
+function renderQuiz(){
+  const el = $('#quiz');
+  let h = botMsg(`안녕하세요, <b>헬과장</b>이에요! 몇 가지만 물어보고 쿠팡 프로틴 ${P.length}개 중에서 딱 맞는 제품을 골라드릴게요.`);
+  for(let i=0;i<DONE;i++){
+    const q = Q[i]; if(skipQ(i)) continue;
+    const cur = i===STEP;
+    if(i>STEP) break;
+    const cov = {lac:covNote(`조금 불편하면 주원료가 WPI(유당을 걸러낸 유청)인 제품 ${COV.lacLittle}개와 식물성 제품 ${COV.lacPlant}개만 남겨요.`), bud:covNote('1회분 가격 = 판매가 × 1회 제공량 ÷ 총 중량. 1회 제공량은 제조사 기준이라 한 스쿱과 다를 수 있어요.')}[q.id]||'';
+    if(!cur){ h += botMsg(esc(BOT[q.id])) + `<div class="msg me"><button class="bub" type="button" data-edit="${i}" aria-label="${esc(ansText(q))} (눌러서 바꾸기)">${esc(ansText(q))}</button></div>`; continue; }
+    h += botMsg(esc(BOT[q.id]) + cov + `<span class="hint">${q.multi?'아래에서 해당하는 것을 모두 누르고 ‘다음’을 눌러 주세요 👇':'아래에서 하나를 골라 주세요 👇'}</span>`, `<div class="chips ans ${q.cls||''}">${q.opts.map(o=>{
+      const on = q.id==='alg' && o[0]==='none' ? A.alg.length===0 : q.multi ? A[q.id].includes(o[0]) : A[q.id]===o[0];
+      const ic = (ICO[q.id]||{})[o[0]]||[], sub = o[2]||ic[1];
+      return `<button class="chip opt" type="button" id="q-${q.id}-${i}-${esc(o[0])}" data-q="${q.id}" data-v="${esc(o[0])}" aria-pressed="${on}">${ic[0]?`<span class="oi" aria-hidden="true">${ic[0]}</span>`:''}<span class="ot">${o[1]}${sub?`<small>${sub}</small>`:''}</span></button>`;}).join('')}
+      ${q.multi?`<button class="btn pri nextq" type="button" data-next="1">${q.id==='alg'?(A.alg.length?'다음':'알레르기 없어요'):(A.ext.length?'다음':'없어요')}</button>`:''}</div>${q.id==='alg'&&A.alg.length?ALGNOTE:''}`);
+  }
+  if(STEP>=DONE){
+    h += botMsg(`조건에 맞는 제품을 골랐어요. 아래 추천을 확인하세요.<br><span class="cov">답을 바꾸고 싶으면 파란 말풍선(내 답)을 누르세요.</span>`)
+      + `<div class="hexc box" id="hexc">${hexCustomHTML()}</div>
+      <details class="wdet"${WOPEN?' open':''}><summary>세부 조정: 무엇을 더 중요하게 볼지 직접 정하기</summary>${weightPanel('')}</details>
+      <div class="chat-acts"><button class="reset" type="button" id="q-reset">처음부터 다시 하기</button><a class="jump" href="#results">추천 결과 보기 ↓</a></div>`;
+  }
+  el.innerHTML = h;
+}
+function chatGo(s){ STEP = s; EDIT = false; try{ localStorage.setItem('ppick-chat', String(STEP)); }catch(e){} update();
+  requestAnimationFrame(()=>{ const t = STEP>=DONE ? $('#results') : $('#quiz .chips.ans'); if(t) t.scrollIntoView({behavior:'smooth', block: STEP>=DONE ? 'start' : 'nearest'}); }); }
+function saveW(){ try{ localStorage.setItem('ppick-weights', JSON.stringify(CW)); }catch(e){} }
+$('#quiz').addEventListener('toggle', e=>{ if(e.target.matches('.wdet')) WOPEN = e.target.open; }, true);
+$('#quiz').addEventListener('input', e=>{
+  const r = e.target.closest('input[data-w]'); if(!r) return;
+  CW[A.goal][r.dataset.w] = +r.value; r.setAttribute('aria-valuetext', r.value);
+  const sh = share(A.goal);
+  for(const k in sh){ const b = document.getElementById('wv-'+k); if(b) b.textContent = Math.round(sh[k]*100)+'%'; }
+  $('#w-reset').hidden = isDefaultW(A.goal);
+  saveW(); if(!HXS.edited) drawHexC(); renderResults(); renderWTable();
+});
+$('#quiz').addEventListener('click', e=>{
+  const hb = e.target.closest('[data-hx]'); if(hb){ setHex(hb.dataset.hx, curHW()[hb.dataset.hx] + +hb.dataset.d); return; }
+  if(e.target.closest('#hx-reset')){ HXS = {edited:false, v:null}; saveHex(); drawHexC(); renderResults(); return; }
+  if(e.target.closest('#w-reset')){ CW[A.goal] = clone(DW[A.goal]); saveW(); update(); return; }
+  if(e.target.closest('#q-reset')){ A = clone(DEF); CW = clone(DW); saveW(); HXS = {edited:false, v:null}; saveHex(); WOPEN = false; chatGo(0); return; }
+  const ed = e.target.closest('[data-edit]'); if(ed){ STEP = +ed.dataset.edit; EDIT = true; update(); requestAnimationFrame(()=>{ const c = $('#quiz .chips.ans'); if(c) c.scrollIntoView({behavior:'smooth', block:'nearest'}); }); return; }
+  const done = () => chatGo(EDIT ? DONE : nextStep(STEP));
+  if(e.target.closest('[data-next]')){ done(); return; }
+  const b = e.target.closest('.chip'); if(!b) return;
+  const q = Q.find(x=>x.id===b.dataset.q), v = b.dataset.v;
+  if(q.id==='alg' && v==='none'){ A.alg = []; done(); return; }
+  else if(q.multi){ A[q.id] = A[q.id].includes(v) ? A[q.id].filter(x=>x!==v) : A[q.id].concat(v); }
+  else { A[q.id] = v; done(); return; }
+  update();
+});
+
+/* ---------- scoring ---------- */
+function weights(){ return share(A.goal); }
+function eligible(p){
+  if(p.cat==='게이너' && A.goal!=='bulk') return false;  /* 게이너는 벌크업에서만 추천 */
+  if(A.alg.includes('milk') && p.milk!=='없음') return false;
+  if(A.alg.includes('soy') && p.soy!=='없음') return false;
+  if((A.goal==='muscle' || A.goal==='night') && p.cat==='식사대용') return false;
+  if(lacOn() && !lacOK(p, A.lac)) return false;
+  if(A.src==='animal' && ptKind(p)!=='동물성') return false;
+  if(A.src==='plant' && !isPlant(p)) return false;  /* 식물성 = 단백질 원료가 모두 식물성 + 원재료에 우유 없음 (같은 시설 여부는 우유 알레르기 질문에서 거름) */
+  if(A.src==='mix' && ptKind(p)!=='복합') return false;
+  const bud = +A.bud; if(bud && !(p.perServ!=null && p.perServ<=bud)) return false;  /* 1회분 가격 = 판매가 × 1회 제공량 ÷ 총 중량, 계산할 수 없으면 제외 */
+  if(A.ext.includes('cert') && !p.cert3) return false;
+  if(A.ext.includes('nowarn') && (p.mix || p.unchk || p.addWarn.length)) return false;
+  if(A.ext.includes('single') && p.bundle) return false;
+  for(const k of A.ext) if(EXTF[k] && !EXTF[k](p)) return false;
+  return true;
+}
+const mv = (p,k) => k==='kcal' && A.goal==='bulk' ? p.m.kcalHi : p.m[k];  /* 벌크업은 칼로리 지표 방향을 반대로 */
+const NIGHT = {'카제인':.25,'우유단백':.15};
+function score(p, w){
+  let s = 0; const parts = {};
+  for(const k in w){ const m = mv(p,k), v = m==null ? 0.3 : m; parts[k] = v*w[k]; s += parts[k]; }
+  let adj = 0;
+  if(A.flav!=='any'){
+    const strong = A.flav==='무맛';
+    if(p.flav.includes(A.flav)) adj += strong?.12:.08;
+    else if(p.flav.length) adj -= strong?.15:.08;  /* 맛 미확인은 가감 없음 */
+  }
+  adj -= (p.mix ? p.wn : 0)*.04;
+  adj -= p.addWarn.length*.04;  /* 아미노산·콜라겐이 원재료 1~5순위에 단독 원료로 있으면 경고 1건으로 봄 */
+  if(p.unchk || p.nopost) adj -= .02;  /* 판매 페이지에 영양정보·원재료표가 없거나 라벨 경고를 판정하지 못함 (라벨 표기 문제는 감점 없음) */
+  if(p.grade==='D') adj -= .06; else if(p.grade==='C') adj -= .02;
+  if(A.goal==='night') adj += NIGHT[p.src]||0;  /* 취침 전: 천천히 흡수되는 카제인 주원료 가점 (우유단백은 카제인이 대부분이라 조금 작게) */
+  return {s: Math.max(0, s+adj), parts};
+}
+function topPct(v){ return Math.max(1, Math.round((1-v)*100)); }
+function reasons(p, parts){
+  const out = [];
+  const keys = Object.keys(parts).sort((a,b)=>parts[b]-parts[a]);
+  for(const k of keys){
+    const v = mv(p,k); if(v==null || v<0.6 || !parts[k]) continue;  /* 가중치 0인 지표는 이유로 쓰지 않음 */
+    if(k==='dens') out.push(`단백질 함량 ${pctS(p.pct)}, ${P.length}개 중 상위 ${topPct(v)}%`);
+    if(k==='value') out.push(`단백질 20g당 ${won(p.p20)}, 상위 ${topPct(v)}% 가성비`);
+    if(k==='taste') out.push(`맛있어요 ${pctS(p.taste)} (리뷰 ${p.rev.toLocaleString('ko-KR')}개)`);
+    if(k==='trust') out.push(p.cert3 ? `${p.cert} 인증, 품질 신뢰도 ${p.q}점` : `품질 신뢰도 ${p.q}점, 공개 자료가 많은 편`);
+    if(k==='pop') out.push(`쿠팡 랭킹 ${p.r}위, 리뷰 ${p.rev.toLocaleString('ko-KR')}개`);
+    if(k==='kcal' && A.goal==='bulk') out.push(`1회 ${p.kcal}kcal로 칼로리가 높은 편, 상위 ${topPct(v)}%`);
+    else if(k==='kcal') out.push(`1회 ${p.kcal}kcal, 칼로리 대비 단백질이 많은 편 (상위 ${topPct(v)}%)`);
+  }
+  if(A.flav!=='any' && p.flav.includes(A.flav)) out.unshift(`원하는 ${A.flav} 맛`);
+  if(A.goal==='night' && NIGHT[p.src]) out.unshift(p.src==='카제인' ? '천천히 흡수되는 카제인이 주원료' : '카제인이 많은 우유단백이 주원료');
+  if(lacOn() && noMilkPlant(p)) out.push('우유가 들어가지 않은 식물성');
+  else if(lacOn() && A.lac==='very') out.push('WPI가 원재료의 99% 이상');
+  else if(lacOn()) out.push('주원료가 WPI(분리유청)');
+  if(lacOn() && p.lacfree==='있음') out.push('락토프리 표기 제품');
+  return out.slice(0,4);
+}
+function cautions(p){
+  const c = [];
+  if(A.alg.length) c.push(p.algText ? `알레르기 표시: ${p.algText}` : '알레르기 표시 원문은 상세페이지에서 확인');
+  if(p.mix) c.push('제품명 과장: '+p.warn);
+  if(p.nopost) c.push('영양정보 미게시: '+p.nopost);
+  p.addWarn.forEach(k=>c.push(addNote(p,k)));
+  if(!p.addWarn.length) p.addInfo.slice(0,1).forEach(k=>c.push(addNote(p,k)));
+  if(p.sp!=null && p.sp<15) c.push(`1회 단백질 ${p.sp}g로 적은 편이라 여러 번 먹어야 함`);
+  if(p.grade==='D') c.push('핵심 영양값 일부를 확인하지 못한 제품');
+  else if(p.grade==='C') c.push('다른 맛·버전 라벨 기준 수치');
+  if(p.taste==null) c.push('맛 설문 없음');
+  else if(p.rev<100 && p.taste>=.95) c.push(`리뷰 ${p.rev}개라 맛 평가 표본이 적음`);
+  if(A.flav!=='any' && !p.flav.length) c.push(p.flavText==='표기 없음' ? '맛 표기 없는 제품' : '맛 확인 안 됨, 상세페이지에서 맛 확인');
+  if(A.src==='plant' && p.milk==='같은 시설') c.push('우유를 쓰는 시설에서 제조');
+  if(p.bundle) c.push('단품이 없어 묶음 옵션 가격');
+  if(p.lblx) c.push('라벨 표기 문제: '+p.lblx);
+  return c.slice(0,3);
+}
+/* 원료 라벨: 단백질 원료가 한 종류면 동물성·식물성, 여러 종류면 동물성복합·식물성복합, 둘이 섞이면 동식물성복합 */
+const ptLabel = p => !p.ptype ? null : p.ptype.kind==='복합' ? '동식물성복합' : p.ptype.kind + (p.ptype.names.length>1 ? '복합' : '');
+function tagsHTML(p){
+  const pl = ptLabel(p), t = [];
+  if(pl) t.push(`<span class="tag" title="단백질 원료: ${esc(p.ptype.names.join(', '))}">${pl}</span>`);
+  t.push(`<span class="tag" title="원재료 1순위">주원료 ${esc(p.src)}</span>`);
+  if(p.cat!=='단백질 보충제') t.push(`<span class="tag">${p.cat}</span>`);
+  if(p.cert3) t.push(`<span class="tag good">${esc(p.cert)}</span>`);
+  else if(p.cert==='HACCP') t.push(`<span class="tag">HACCP</span>`);
+  if(p.lacfree==='있음') t.push(`<span class="tag good">락토프리 표기</span>`);
+  if(p.milk==='없음') t.push(`<span class="tag good">우유 없음</span>`);
+  if(p.soy==='없음') t.push(`<span class="tag good">대두 없음</span>`);
+  if(p.mix) t.push(`<span class="tag warn" title="${esc(p.warn)}">제품명 과장</span>`);
+  if(p.nopost) t.push(`<span class="tag note" title="${esc(p.nopost)}">영양정보 미게시</span>`);
+  else if(p.unchk) t.push(`<span class="tag muted">라벨 미검사</span>`);
+  if(p.lblx) t.push(`<span class="tag muted" title="${esc(p.lblx)}">라벨 표기 문제</span>`);
+  p.addWarn.forEach(k=>t.push(`<span class="tag warn">${ADDN[k]} 첨가</span>`));
+  p.addInfo.forEach(k=>t.push(`<span class="tag muted">${ADDN[k]} 소량</span>`));
+  return `<div class="tags">${t.join('')}</div>`;
+}
+function rk(v){ return v==null ? '' : `<span class="rk">상위 ${topPct(v)}%</span>`; }
+function card(x,i){
+  const p = x.p;
+  return `<article class="label">
+    <div class="hd">${thumb(p, `추천 ${i+1}위`)}
+      <div class="info"><p class="nm">${esc(p.short)}</p><div class="mk">${esc(p.mk)} · ${p.origin} · 쿠팡 ${p.r}위</div>
+        ${rateHTML(p)}${priceHTML(p)}
+        <span class="fit">적합도 <b>${Math.round(x.s*100)}</b></span></div></div>
+    ${tagsHTML(p)}
+    <div class="hexmini">${hexSVG(p,{pref:hexPref(), target:hexTarget(), full:true})}<p class="cov"><b style="color:var(--accent)">━</b> 이 제품 · <b style="color:var(--warn)">┅</b> 원하는 능력치${x.hex!=null?` · 충족 ${Math.round(x.hex*100)}%`:''}</p></div>
+    <div class="facts">
+      <div class="row"><span>회당 가격</span><b>${p.perServ!=null?won(p.perServ)+`<span class="rk">${scoopTxt(p)}</span>`:'<span class="rk na">확인 안 됨</span>'}</b></div>
+      <div class="row mx"><span>총량</span><b class="txt">${esc(sizeTxt(p))}</b></div>
+      <div class="row"><span>단백질 함량</span><b>${pctS(p.pct)}${rk(p.m.dens)}</b></div>
+      <div class="row"><span>단백질 20g당</span><b>${won(p.p20)}${rk(p.m.value)}</b></div>
+      <div class="row"><span>맛</span><b class="txt">${p.flavText?esc(p.flavText):'<span class="rk na">확인 안 됨</span>'}</b></div>
+      <div class="row mx"><span>맛있어요</span><b>${p.taste==null?'설문 없음':pctS(p.taste)}</b></div>
+      ${p.kcal!=null?`<div class="row${A.goal==='diet'||A.goal==='bulk'?'':' mx'}"><span>1회 칼로리</span><b>${p.kcal}kcal</b></div>`:''}
+      <div class="row mx"><span>품질 신뢰도</span><b>${p.q}<span class="rk">/100</span></b></div>
+    </div>
+    <p class="mxnote">총량·맛 평가·품질 신뢰도는 ‘자세히’에서 볼 수 있어요.</p>
+    <ul class="why">${reasons(p,x.parts).map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
+    ${cautions(p).length?`<ul class="care">${cautions(p).map(r=>`<li>${esc(r)}</li>`).join('')}</ul>`:''}
+    <div class="acts">
+      ${buyUrl(p)?`<a class="btn pri" href="${esc(buyUrl(p))}" target="_blank" rel="${buyRel(p)}">쿠팡에서 보기</a>`:''}
+      <button class="btn" type="button" data-detail="${p.r}">자세히</button>
+      ${cmpBtn(p,'btn cmp-b')}
+    </div>
+  </article>`;
+}
+function itemRow(p, lead, note){
+  return `<div class="irow"><button class="item" type="button" data-detail="${p.r}">
+    ${thumb(p, lead)}
+    <span class="t">${esc(p.short)}</span>
+    ${priceHTML(p)}
+    ${rateHTML(p)}
+    <span class="spec"><i>단백질 함량</i> ${pctS(p.pct)} · <i>맛있어요</i> ${p.taste==null?'—':pctS(p.taste)}</span>
+    ${tagsHTML(p)}${note?`<span class="why1">${note}</span>`:''}
+  </button>${cmpBtn(p,'cmp-tg')}</div>`;
+}
+function summaryHTML(pool, w, moved){
+  const WHY = {
+    muscle:'운동 후 단백질을 채우는 게 목적이라, 한 번에 단백질을 충분히 먹을 수 있는지와 꾸준히 먹을 수 있는 가격인지를 중심으로 봤어요. 게이너와 식사대용 제품은 뺐어요.',
+    diet:'칼로리를 크게 늘리지 않고 단백질을 채우는 게 목적이라, 같은 양에 단백질이 많이 든 제품을 가장 중요하게 봤어요. 단백질 함량이 높을수록 탄수화물·지방 같은 다른 성분 비중은 작아요. 게이너는 뺐어요.',
+    bulk:'체중과 근육량을 함께 늘리는 게 목적이라, 한 번에 먹는 칼로리가 높은지와 가격을 중심으로 봤어요. 게이너도 후보에 넣었어요.',
+    night:'자기 전에 먹는 게 목적이라, 천천히 흡수되는 카제인이 주원료인 제품에 가점을 줬어요(우유단백은 카제인이 대부분이라 조금 작게). 게이너와 식사대용 제품은 뺐어요.'
+  };
+  const top = Object.keys(w).filter(k=>w[k]>0).sort((a,b)=>w[b]-w[a]).slice(0,2);
+  const focus = top.map(k=>`${ML[k]} ${Math.round(w[k]*100)}%`).join(', ');
+  const conds = [A.alg.includes('milk')?'우유 알레르기: 유제품 제외':null, A.alg.includes('soy')?'콩 알레르기: 대두 제외':null,
+    lacOn()?(A.lac==='very'?'WPI 99% 이상·식물성':'주원료 WPI·식물성'):null,
+    {animal:'동물성 단백질만',plant:'식물성 단백질만(원재료에 우유 없음)',mix:'복합성(동물성+식물성)'}[A.src]||null,
+    A.flav!=='any'?A.flav+' 맛 우선':null, +A.bud?`1회분 ${(+A.bud).toLocaleString('ko-KR')}원 이하`:null,
+    A.ext.includes('cert')?'제3자 인증':null, A.ext.includes('nowarn')?'제품명 과장·첨가 경고 없음':null, A.ext.includes('single')?'단품':null, ...A.ext.filter(k=>EXTF[k]).map(k=>EXTN[k])].filter(Boolean);
+  const avg = (arr,k)=>{ const v = arr.map(x=>x.p[k]).filter(x=>x!=null); return v.length? v.reduce((a,b)=>a+b,0)/v.length : null; };
+  const t3 = pool.slice(0,3);
+  const srcCount = {}; t3.forEach(x=>srcCount[x.p.src]=(srcCount[x.p.src]||0)+1);
+  const srcTxt = Object.entries(srcCount).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}개`).join(', ');
+  const pA = avg(t3,'pct'), pB = avg(pool,'pct'), vA = avg(t3,'p20'), vB = avg(pool,'p20'), tA = avg(t3,'taste'), tB = avg(pool,'taste');
+  const cmp = [];
+  if(pA!=null && pB!=null) cmp.push(`단백질 함량 평균 ${Math.round(pA*100)}% (후보 평균 ${Math.round(pB*100)}%)`);
+  if(vA!=null && vB!=null) cmp.push(`20g당 평균 ${won(vA)} (후보 평균 ${won(vB)})`);
+  if(tA!=null && tB!=null) cmp.push(`맛있어요 평균 ${Math.round(tA*100)}% (후보 평균 ${Math.round(tB*100)}%)`);
+  const certN = t3.filter(x=>x.p.cert3).length, warnN = t3.filter(x=>x.p.mix).length, unN = t3.filter(x=>x.p.unchk && !x.p.nopost).length,
+    npN = t3.filter(x=>x.p.nopost).length, lxN = t3.filter(x=>x.p.lblx).length;
+  const notes = [];
+  if(certN) notes.push(`${certN}개는 제3자 인증 제품이에요.`);
+  if(unN) notes.push(`${unN}개는 라벨 경고 검사를 하지 않은 제품이라 원재료표를 직접 확인하세요.`);
+  const addN = t3.filter(x=>x.p.addWarn.length||x.p.addInfo.length).length;
+  if(addN) notes.push(`${addN}개는 아미노산이나 콜라겐이 들어 있어 실제 단백질 함량이 표시보다 낮을 수 있어요.`);
+  if(warnN) notes.push(`${warnN}개는 제품명 과장이 있어요. 제품명에 적힌 단백질과 실제 원재료 구성이 달라 원재료를 확인하세요.`);
+  if(npN) notes.push(`${npN}개는 쿠팡 판매 페이지에 영양정보나 원재료표가 없는 제품이에요.`);
+  if(lxN) notes.push(`${lxN}개는 라벨 표기 문제가 있어요(감점 없음).`);
+  if(lacOn()) notes.push(A.lac==='very' ? `유당이 아주 부담되면 WPI(가수분해 WPI 포함)가 원재료의 99% 이상인 제품과 우유가 들어가지 않은 식물성 제품만 남겼어요. 원재료표에 %가 적혀 있지 않은 WPI 제품은 넣지 않아요. WPI도 유당이 조금 남을 수 있으니 락토프리 표기를 함께 확인하세요.` : `유당을 걸러내는 공정을 거친 WPI(분리유청)가 원재료 1순위인 제품과 우유가 들어가지 않은 식물성 제품만 남겼어요. WPI 제품은 다른 원료가 섞여 있을 수 있어요.`);
+  if(A.alg.length) notes.push('알레르기 조건은 라벨에서 해당 성분이 없다고 확인된 제품만 남겼어요(같은 시설에서 만든 제품도 뺌).');
+  if(A.src==='plant') notes.push('식물성은 단백질 원료가 모두 식물성(대두·완두·쌀 등)이고 원재료에 우유가 없는 제품이에요(우유를 쓰는 시설에서 만든 제품은 포함).');
+  if(A.src==='animal' || A.src==='mix') notes.push('원료 구분은 원재료에서 단백질 원료만 보고 나눠요. 크리머 안의 카제인나트륨, 탈지분유·유청분말, 대두 레시틴은 세지 않아요.');
+  if(A.flav!=='any'){ const hit = pool.filter(x=>x.flavHit).length; notes.push(hit>=3 ? `${A.flav} 맛 제품 ${hit}개를 먼저 보여줘요.` : hit ? `조건에 맞는 ${A.flav} 맛 제품이 ${hit}개뿐이라, 나머지 자리는 다른 맛 제품이에요.` : `조건에 맞는 ${A.flav} 맛 제품이 없어 다른 맛 제품을 보여줘요.`); }
+  if(moved && moved.length) notes.push(`같은 제조원 제품이 겹쳐 ${moved.map(x=>{ const t = x.p.short; return t.length>14 ? t.slice(0,14).trim()+'…' : t; }).join(', ')} 제품은 4위 아래로 내렸어요.`);
+  if(pool.length<10) notes.push(`조건에 맞는 후보가 ${pool.length}개뿐이라 조건을 풀면 선택지가 늘어나요.`);
+  return `<section class="summary" aria-label="${GOALN[A.goal]} 추천 요약">
+    <div class="sm-row"><span class="sm-k">기준</span><p>${WHY[A.goal]} 지금은 <b>${focus}</b>를 가장 크게 반영하고 있어요.</p></div>
+    <div class="sm-row"><span class="sm-k">조건</span><p>${conds.length?esc(conds.join(' · ')):'추가 조건 없음'} · 게이너 제외 후 후보 <b>${pool.length}개</b></p></div>
+    <div class="sm-row"><span class="sm-k">결과</span><p>상위 3개는 ${esc(srcTxt)}예요. ${cmp.join(', ')}. ${notes.join(' ')}</p></div>
+  </section>`;
+}
+const mkKey = s => !s || /^(확인|제조원 미확인)/.test(s) ? '' : s.replace(/\(.*?\)|\s/g,'').toLowerCase();
+function sameMk(a, b){ const x = mkKey(a.mk), y = mkKey(b.mk); return !!x && !!y && (x===y || x.includes(y) || y.includes(x)); }
+function nextNote(x, picks){
+  const r = reasons(x.p, x.parts)[0];
+  const gap = Math.round(picks[picks.length-1].s*100) - Math.round(x.s*100);
+  const parts = [`적합도 ${Math.round(x.s*100)}${gap>0?` (3위보다 ${gap}점 낮음)`:''}`];
+  if(A.flav!=='any' && !x.flavHit) parts.push(x.p.flav.length ? `다른 맛(${x.p.flavText})` : '맛 확인 안 됨');
+  if(x.div) parts.push(`같은 제조원 제품(${x.div.p.short.slice(0,18)}${x.div.p.short.length>18?'…':''})이 위에 있어 3위 밖으로 내림`);
+  else if(r) parts.push(r);
+  return esc(parts.join(' · '));
+}
+/* 결과가 0개일 때: 서로 맞지 않는 조합이면 그 이유를, 아니면 하나만 풀었을 때 후보가 가장 많이 생기는 조건을 알려줌 */
+function emptyHint(){
+  if(A.alg.includes('milk') && (A.src==='animal' || A.src==='mix')) return '우유 알레르기와 ‘동물성’·‘복합성’은 함께 고르기 어려워요. 동물성 단백질은 대부분 우유에서 나오니, 우유 알레르기가 있으면 ‘식물성’을 골라 주세요.';
+  const opts = [];
+  A.alg.forEach(a=>opts.push([{alg:A.alg.filter(x=>x!==a)}, a==='milk'?'우유 알레르기':'콩 알레르기']));
+  if(A.lac!=='ok') opts.push([{lac:'ok'}, '유당 조건']);
+  if(A.src!=='any') opts.push([{src:'any'}, '원료 선호']);
+  if(+A.bud) opts.push([{bud:'0'}, '1회분 예산']);
+  A.ext.forEach(e=>opts.push([{ext:A.ext.filter(x=>x!==e)}, (Q.find(q=>q.id==='ext').opts.find(o=>o[0]===e)||[,e])[1]]));
+  const save = A; let best = null;
+  for(const [ch, label] of opts){ A = Object.assign({}, save, ch); const n = P.filter(eligible).length; if(n && (!best || n>best[1])) best = [label, n]; }
+  A = save;
+  const josa = w => { const c = w.charCodeAt(w.length-1); return c>=0xAC00 && c<=0xD7A3 && (c-0xAC00)%28 ? '을' : '를'; };
+  return best ? `‘${best[0]}’${josa(best[0])} 빼면 후보가 ${best[1]}개 생겨요.` : '조건을 하나씩 풀어보세요.';
+}
+function fabUpdate(){ const f = $('#fab'); if(!f) return; const r = $('#results').getBoundingClientRect(); f.hidden = $('#view-rec').hidden || STEP<DONE || r.top < innerHeight*0.7; }
+addEventListener('scroll', ()=>fabUpdate(), {passive:true}); addEventListener('resize', ()=>fabUpdate());
+function renderResults(){
+  const w = weights();
+  let pool = P.filter(eligible).map(p=>{ const o = Object.assign({p}, score(p,w)); o.base = o.s; o.hex = hexFit(p); if(o.hex!=null) o.s = .5*o.s + .5*o.hex; return o; }).sort((a,b)=>b.s-a.s);  /* 최종 적합도 = 지표 점수와 원하는 능력치 충족도의 평균 */
+  /* 원하는 맛을 고르면 그 맛 제품을 먼저 보여주고, 나머지(다른 맛·맛 미확인)는 뒤로 */
+  if(A.flav!=='any'){ pool.forEach(x=>x.flavHit = x.p.flav.includes(A.flav)); pool = pool.filter(x=>x.flavHit).concat(pool.filter(x=>!x.flavHit)); }
+  const el = $('#results');
+  /* 상위 3개는 같은 제조원 제품이 겹치지 않게 고른다 (제조원 미확인은 묶지 않음) */
+  const picks = [], rest = [], moved = [];
+  for(const x of pool){
+    if(picks.length<3 && !picks.some(y=>sameMk(x.p, y.p))) picks.push(x);
+    else { if(picks.length<3) { x.div = picks.find(y=>sameMk(x.p, y.p)); moved.push(x); } rest.push(x); }
+  }
+  /* 맛을 골랐으면 맛이 맞는 제품을 제조원 중복보다 우선 (같은 제조원이라 밀린 맛 일치 제품이 다른 맛 제품보다 아래로 가지 않게) */
+  if(A.flav!=='any') for(let i=picks.length-1;i>=0;i--){ if(picks[i].flavHit) continue; const j = rest.findIndex(x=>x.flavHit); if(j<0) break; const h = rest.splice(j,1)[0]; h.div = null; rest.unshift(picks[i]); picks[i] = h; }
+  picks.sort((a,b)=>(b.flavHit?1:0)-(a.flavHit?1:0) || b.s-a.s); rest.sort((a,b)=>(b.flavHit?1:0)-(a.flavHit?1:0) || b.s-a.s);
+  const ranked = picks.concat(rest);
+  const desc = [GOALN[A.goal], lacOn()?(A.lac==='very'?'유당 최소(WPI 99%·식물성)':'유당 부담 적게(WPI·식물성)'):null, A.flav!=='any'?A.flav+' 맛':null, +A.bud?`1회분 ${(+A.bud).toLocaleString('ko-KR')}원 이하`:null].filter(Boolean).join(' · ');
+  if(!pool.length){
+    $('#fab-n').textContent = '조건에 맞는 제품 없음'; setTimeout(fabUpdate, 0);
+    el.innerHTML = `<div class="res-head"><h2>조건에 맞는 제품이 없어요</h2></div>
+      <div class="empty">${esc(desc)} 조건을 모두 만족하는 제품이 없어요.<br>${esc(emptyHint())}</div>`;
+    return;
+  }
+  $('#fab-n').textContent = `후보 ${pool.length}개`; setTimeout(fabUpdate, 0);
+  el.innerHTML = `<div class="res-head"><h2>${esc(desc)}에 맞는 추천</h2><p>후보 ${pool.length}개 중 상위 ${Math.min(3,pool.length)}개</p></div>
+    ${summaryHTML(ranked, w, moved)}
+    <div class="podium">${picks.map(card).join('')}</div>
+    ${rest.length?`<div class="more"><h3>다음 후보</h3><div class="list">${rest.slice(0,7).map((x,i)=>itemRow(x.p, i+4, nextNote(x, picks))).join('')}</div></div>`:''}`;
+}
+
+/* ---------- catalog ---------- */
+const F = {cat:'all', src:'all', flags:[], q:'', sort:'r'};
+const CATS = [['all','전체'],['단백질 보충제','단백질 보충제'],['게이너','게이너'],['식사대용','식사대용']];
+const srcF = p => p.src==='확인 불가' ? '기타' : p.src;  /* 주원료 필터: 확인 불가는 기타로 묶음 */
+const SRCS = [['all','전체']].concat([...new Set(P.map(srcF))].sort((a,b)=>(a==='기타')-(b==='기타')).map(s=>[s,s]));
+const FLAGS = [['nomilk','우유 없음 확인'],['nosoy','대두 없음 확인'],['lacfree','락토프리 표기'],['cert','제3자 인증'],['noadd','첨가 경고 없음'],['main99','주원료 99% 이상'],['nosweet','인공감미료 없음'],['lowsugar','저당·저지방 (당류 1g·지방 2g 이하)']];
+function chipGroup(id, list, cur, multi){
+  const g = $(id); const lab = g.querySelector('span').outerHTML;
+  g.innerHTML = lab + list.map(([v,l])=>`<button class="chip" type="button" id="f-${id.slice(3)}-${esc(v)}" data-v="${esc(v)}" aria-pressed="${multi?cur.includes(v):cur===v}">${esc(l)}</button>`).join('');
+}
+function renderCatalog(){
+  chipGroup('#f-cat', CATS, F.cat); chipGroup('#f-src', SRCS, F.src); chipGroup('#f-flag', FLAGS, F.flags, true);
+  const q = F.q.trim().toLowerCase();
+  let rows = P.filter(p=>(F.cat==='all'||p.cat===F.cat)&&(F.src==='all'||srcF(p)===F.src)
+    &&(!F.flags.includes('nomilk')||p.milk==='없음')&&(!F.flags.includes('nosoy')||p.soy==='없음')&&(!F.flags.includes('lacfree')||p.lacfree==='있음')&&(!F.flags.includes('cert')||p.cert3)&&(!F.flags.includes('noadd')||!p.addWarn.length)&&F.flags.every(k=>!EXTF[k]||EXTF[k](p))
+    &&(!q||[p.n,p.ing,p.mk,p.ingFull,p.flavText].join(' ').toLowerCase().includes(q)));
+  const s = F.sort, nullLast = (a,b,f)=> (a==null)-(b==null) || f();
+  const cmp = {r:(a,b)=>a.r-b.r, p20:(a,b)=>nullLast(a.p20,b.p20,()=>a.p20-b.p20), pct:(a,b)=>nullLast(a.pct,b.pct,()=>b.pct-a.pct),
+    taste:(a,b)=>nullLast(a.tb,b.tb,()=>b.tb-a.tb), q:(a,b)=>b.q-a.q||a.r-b.r, price:(a,b)=>a.price-b.price, scoop:(a,b)=>nullLast(a.perServ,b.perServ,()=>a.perServ-b.perServ)}[s];
+  rows.sort(cmp);
+  $('#cat-count').textContent = `${rows.length}개 제품` + (s==='taste'?' · 맛은 리뷰 수를 반영한 보정값 순':'');
+  $('#catalog').innerHTML = rows.length ? rows.map(p=>itemRow(p, p.r)).join('') : `<div class="empty">조건에 맞는 제품이 없어요. 필터를 하나 풀어보세요.</div>`;
+}
+$('#view-all').addEventListener('click', e=>{
+  const b = e.target.closest('.filters .chip'); if(!b) return;
+  const g = b.parentElement.id, v = b.dataset.v;
+  if(g==='f-cat') F.cat=v; else if(g==='f-src') F.src=v; else F.flags = F.flags.includes(v)?F.flags.filter(x=>x!==v):F.flags.concat(v);
+  renderCatalog();
+});
+$('#q-search').addEventListener('input', e=>{F.q=e.target.value; renderCatalog(); if(F.q.trim()) showTab('all');});
+$('#sbar').addEventListener('submit', e=>{ e.preventDefault(); showTab('all'); });
+$('#q-sort').addEventListener('click', e=>{ const b = e.target.closest('[data-sort]'); if(!b) return; F.sort=b.dataset.sort;
+  document.querySelectorAll('#q-sort [data-sort]').forEach(x=>x.setAttribute('aria-pressed', x===b)); renderCatalog(); });
+
+/* ---------- compare (최대 3개, 이 브라우저에만 기억) ---------- */
+let CMP = [];
+try{ const s = JSON.parse(localStorage.getItem('ppick-cmp')||'[]'); if(Array.isArray(s)) CMP = s.filter(n=>P.some(p=>p.n===n)).slice(0,3); }catch(e){}
+const inCmp = p => CMP.includes(p.n);
+function cmpBtn(p, cls){ const on = inCmp(p); return `<button class="${cls}" type="button" data-cmp="${p.r}" aria-pressed="${on}" aria-label="${esc(p.short)} 비교${on?'에서 빼기':'에 담기'}">${on?'✓ 비교 중':'＋ 비교'}</button>`; }
+function saveCmp(){ try{ localStorage.setItem('ppick-cmp', JSON.stringify(CMP)); }catch(e){} }
+function refreshCmp(msg){
+  document.querySelectorAll('[data-cmp]:not(.tray-x):not(.cmp-keep)').forEach(b=>{ const p = P.find(x=>x.r===+b.dataset.cmp); if(!p) return; const on = inCmp(p);
+    b.setAttribute('aria-pressed', on); b.textContent = on ? '✓ 비교 중' : '＋ 비교'; b.setAttribute('aria-label', `${p.short} 비교${on?'에서 빼기':'에 담기'}`); });
+  const tray = $('#tray'); tray.hidden = CMP.length===0; document.body.classList.toggle('has-tray', CMP.length>0);
+  $('#tray-k').textContent = `비교함 ${CMP.length}/3`;
+  $('#tray-items').innerHTML = CMP.map(n=>{ const p = P.find(x=>x.n===n); return `<span class="tray-it"><span>${esc(p.short)}</span><button type="button" data-cmp="${p.r}" class="tray-x" aria-label="${esc(p.short)} 비교에서 빼기">×</button></span>`; }).join('');
+  $('#tray-go').disabled = CMP.length<2; $('#tray-go').textContent = CMP.length<2 ? '하나 더 담아 주세요' : '비교하기';
+  $('#tray-msg').textContent = msg || '';
+  if($('#cmp').open){ if(CMP.length) renderCmp(); else $('#cmp').close(); }
+}
+function toggleCmp(r){
+  const p = P.find(x=>x.r===+r); if(!p) return;
+  if(inCmp(p)) CMP = CMP.filter(n=>n!==p.n);
+  else if(CMP.length>=3) return refreshCmp('3개까지 비교할 수 있어요. 하나를 빼고 담아 주세요.');
+  else CMP = CMP.concat(p.n);
+  saveCmp(); refreshCmp();
+}
+function renderCmp(){
+  const ps = CMP.map(n=>P.find(x=>x.n===n));
+  const w = weights();
+  const fit = p => eligible(p) ? Math.round(score(p,w).s*100) : null;
+  const best = (get, low) => { const v = ps.map(get).filter(x=>x!=null); if(v.length<2) return null; return low ? Math.min(...v) : Math.max(...v); };
+  const rows = [
+    ['지금 조건 적합도', p=>fit(p), v=>v==null?'<span class="rk na">조건 밖</span>':v, false],
+    ['판매가', p=>p.price, won, true],
+    ['회당 가격', p=>p.perServ, (v,p)=>v==null?val(null):`${won(v)} <span class="rk">${p.ss}g · 단백질 ${p.sp??'—'}g</span>`, true],
+    ['총량', p=>null, (v,p)=>esc(sizeTxt(p)), null],
+    ['단백질 20g당', p=>p.p20, won, true],
+    ['단백질 함량', p=>p.pct, pctS, false],
+    ['1회 단백질', p=>p.sp, (v,p)=>v==null?val(null):`${v}g / ${p.ss??'—'}g`, null],
+    ['맛있어요', p=>p.tb, (v,p)=>p.taste==null?'설문 없음':`${pctS(p.taste)} <span class="rk">리뷰 ${p.rev.toLocaleString('ko-KR')}</span>`, false],
+    ['평점', p=>p.rating, v=>v==null?'—':v, null],
+    ['품질 신뢰도', p=>p.q, v=>`${v}<span class="rk">/100</span>`, false],
+    ['제3자 인증', p=>null, (v,p)=>p.cert3?`<span class="tag good">${esc(p.cert)}</span>`:esc(p.cert||'—'), null],
+    ['제품명 과장', p=>null, (v,p)=>p.mix?`<span class="warn-t">있음</span> <span class="rk na">${esc(p.warn)}</span>`:p.unchk?'<span class="rk na">판정 못 함</span>':'없음', null],
+    ['영양정보 게시', p=>null, (v,p)=>p.nopost?`<span class="warn-t">미게시</span> <span class="rk na">${esc(p.nopost)}</span>`:'게시', null],
+    ['라벨 표기 문제', p=>null, (v,p)=>p.lblx?`<span class="rk na">${esc(p.lblx)}</span>`:'없음', null],
+    ['아미노산·콜라겐', p=>null, (v,p)=>p.addWarn.length?`<span class="warn-t">${p.addWarn.map(k=>ADDN[k]).join('·')} 첨가</span>`:p.addInfo.length?`<span class="rk na">${p.addInfo.map(k=>ADDN[k]).join('·')} 소량</span>`:'없음', null],
+    ['주원료', p=>null, (v,p)=>esc(p.src), null],
+    ['맛', p=>null, (v,p)=>val(p.flavText), null],
+    ['우유 함유', p=>null, (v,p)=>val(p.milk), null],
+    ['대두 함유', p=>null, (v,p)=>val(p.soy), null],
+    ['1회 칼로리', p=>null, (v,p)=>p.kcal!=null?`${p.kcal}kcal`:val(null), null],
+    ['출처 등급', p=>null, (v,p)=>esc(GRADE[p.grade]||p.grade), null],
+  ];
+  const lead = new Map();
+  const nm = p => p.short.length>18 ? p.short.slice(0,18)+'…' : p.short;
+  const bp = (get, low) => { const b = best(get, low); if(b==null) return null; const hit = ps.filter(p=>get(p)===b); return hit.length===1 ? hit[0] : null; };
+  const a = bp(p=>p.p20, true), b = bp(p=>p.pct, false), c = bp(p=>p.tb, false), d = bp(p=>p.q, false);
+  [[a,'20g당 가격'],[b,'단백질 함량'],[c,'맛 평가'],[d,'품질 신뢰도']].forEach(([p,l])=>{ if(p) lead.set(p, (lead.get(p)||[]).concat(l)); });
+  const leadTxt = [...lead].map(([p,ls])=>`${nm(p)}(${ls.join('·')})`).join(', ');
+  $('#cmp-sheet').innerHTML = `<button class="close" type="button" id="c-close" aria-label="닫기">×</button>
+    <h2 id="cmp-title">제품 ${ps.length}개 비교</h2>
+    <p class="sub">${leadTxt ? '항목별로 가장 좋은 제품: ' + esc(leadTxt) + '. 초록 칸이 항목별 가장 좋은 값이고, 맛 평가는 리뷰 수를 반영한 값으로 비교했어요.' : '비교할 값이 충분하지 않아요.'}</p>
+    ${ps.length>2?'<p class="cmp-hint">표를 옆으로 밀면 다른 제품도 볼 수 있어요 →</p>':''}
+    <div class="cmp-wrap"><table class="cmp-t">
+      <thead><tr><th scope="col"><span class="sr">항목</span></th>${ps.map(p=>`<th scope="col"><button type="button" class="cmp-nm" data-detail="${p.r}">${esc(p.short)}</button><span class="rk na">${esc(p.mk)} · 쿠팡 ${p.r}위</span></th>`).join('')}</tr></thead>
+      <tbody>${rows.map(([label,get,fmt,low])=>{ const bv = low==null ? null : best(get, low);
+        return `<tr><th scope="row">${label}</th>${ps.map(p=>{ const v = get(p); const isB = bv!=null && v===bv; return `<td${isB?' class="best"':''}>${fmt(v,p)}${isB?' <span class="bmark">가장 좋음</span>':''}</td>`; }).join('')}</tr>`; }).join('')}</tbody>
+      <tfoot><tr><th scope="row"></th>${ps.map(p=>`<td><div class="cmp-acts">${buyUrl(p)?`<a class="btn pri" href="${esc(buyUrl(p))}" target="_blank" rel="${buyRel(p)}">쿠팡에서 보기</a>`:''}<button class="btn cmp-keep" type="button" data-cmp="${p.r}">빼기</button></div></td>`).join('')}</tr></tfoot>
+    </table></div>`;
+}
+$('#tray-go').addEventListener('click', ()=>{ if(CMP.length<2) return; renderCmp(); const d = $('#cmp'); if(!d.open) d.showModal(); });
+$('#tray-clear').addEventListener('click', ()=>{ CMP = []; saveCmp(); refreshCmp(); });
+
+/* ---------- detail ---------- */
+const QD = [['제3자 인증',25],['성적서 공개',20],['아미노산 조성',15],['표시 정확도',15],['중금속',10],['미생물',5],['원료 출처',5],['회수 이력 없음',5]];
+const GRADE = {A:'A · 쿠팡 판매품 라벨에서 직접 확인',B:'B · 같은 맛 해외 공식 라벨',C:'C · 다른 맛·버전 라벨 (값이 다를 수 있음)',D:'D · 핵심값 일부 확인 불가'};
+function openDetail(r){
+  const p = P.find(x=>x.r===+r); if(!p) return;
+  $('#sheet').innerHTML = `<button class="close" type="button" id="d-close" aria-label="닫기">×</button>
+    <div class="dt-top">${thumb(p, `${p.r}위`)}
+      <div class="info"><h2>${esc(p.n)}</h2>
+        <div class="sub">${esc(p.mk)} · ${p.origin} · 쿠팡 랭킹 ${p.r}위 · 리뷰 ${p.rev.toLocaleString('ko-KR')}개 · 평점 ${p.rating??'—'}</div>
+        ${rateHTML(p)}${priceHTML(p)}
+        ${tagsHTML(p)}
+        <div class="acts">${buyUrl(p)?`<a class="btn pri" href="${esc(buyUrl(p))}" target="_blank" rel="${buyRel(p)}">쿠팡에서 보기</a>`:''}${cmpBtn(p,'btn cmp-b')}</div></div></div>
+    <h4>한눈에 보기</h4>${hexSVG(p)}<p class="cov">${HEXNOTE}</p>
+    <h4>영양·가격</h4>
+    <div class="facts">
+      <div class="row"><span>판매가 (${META.collected?META.collected.slice(5).replace('-','/'):'—'})</span><b>${won(p.price)}</b></div>
+      <div class="row"><span>총량</span><b class="txt">${esc(sizeTxt(p))}</b></div>
+      <div class="row"><span>1회 제공량 / 단백질</span><b>${p.ss??'—'}g / ${p.sp??'—'}g</b></div>
+      <div class="row"><span>1스쿱 가격</span><b>${p.perServ!=null?won(p.perServ):val(null)}</b></div>
+      <div class="row"><span>단백질 함량</span><b>${pctS(p.pct)}${rk(p.m.dens)}</b></div>
+      <div class="row"><span>단백질 20g당 가격</span><b>${won(p.p20)}${rk(p.m.value)}</b></div>
+      <div class="row"><span>맛있어요</span><b>${p.taste==null?'설문 없음':pctS(p.taste)}</b></div>
+    </div>
+    <h4>맛·알레르기·영양 <span class="rk">${p.checked?`확인일 ${esc(p.checked)}`:'라벨 조사 전'}</span></h4>
+    <div class="facts">
+      <div class="row"><span>맛</span><b class="txt">${val(p.flavText)}</b></div>
+      <div class="row"><span>우유 함유</span><b class="txt">${val(p.milk)}</b></div>
+      <div class="row"><span>대두 함유</span><b class="txt">${val(p.soy)}</b></div>
+      <div class="row"><span>락토프리 표기</span><b class="txt">${val(p.lacfree)}</b></div>
+      <div class="row"><span>1회 칼로리</span><b>${p.kcal!=null?p.kcal+'kcal':val(null)}</b></div>
+      <div class="row"><span>1회 당류 · 탄수화물 · 지방</span><b>${[p.sugar,p.carb,p.fat].every(v=>v==null)?val(null):[p.sugar,p.carb,p.fat].map(v=>v==null?'—':v+'g').join(' · ')}</b></div>
+    </div>
+    <h4>알레르기 유발물질 표시</h4><p>${val(p.algText)}</p>
+    <h4>${p.ingFull?'원재료 전체':'원재료 앞 3개'}</h4><p>${esc(p.ingFull||p.ing)}</p>
+    ${(p.addWarn.length||p.addInfo.length)?`<h4>아미노산·콜라겐</h4><p>${[...p.addWarn,...p.addInfo].map(k=>esc(addNote(p,k))).join('<br>')}</p>`:''}
+    ${p.note2?`<h4>추가 조사 출처·비고</h4><p>${esc(p.note2)}</p>`:''}
+    <h4>품질 신뢰도</h4>
+    <div class="bars">${QD.map(([l,m],i)=>`<div class="bar"><span>${l}</span><span class="tr"><i style="width:${(p.qd[i]/m*100).toFixed(0)}%"></i></span><span class="num">${p.qd[i]}/${m}</span></div>`).join('')}</div>
+    <div class="qtotal"><span>총점</span><span class="num">${p.q}/100</span></div>
+    <h4>라벨 확인</h4>
+    <dl class="lblchk">
+      <dt>제품명 과장</dt><dd>${p.mix ? `<span class="warn-t">있음</span> · ${esc(p.warn)}` : p.unchk ? '판정하지 못함' + (p.warn ? ` (${esc(p.warn)})` : '') : '없음'}</dd>
+      <dt>영양정보 미게시</dt><dd>${p.nopost ? `<span class="warn-t">미게시</span> · ${esc(p.nopost)}` : '없음 (판매 페이지에 게시)'}</dd>
+      <dt>라벨 표기 문제</dt><dd>${p.lblx ? `<span class="warn-t">있음</span> · ${esc(p.lblx)} <span class="rk na">(감점 없음)</span>` : '없음'}</dd>
+    </dl>
+    <h4>Non-GMO · 대두·옥수수 원료</h4><p>${esc(p.gmo)} · 대두·옥수수 ${esc(p.soycorn)}</p>
+    <h4>출처 등급</h4><p>${GRADE[p.grade]||esc(p.grade)}</p>
+    ${p.memo?`<h4>조사 메모</h4><p>${esc(p.memo)}</p>`:''}
+    <div class="acts" style="margin-top:16px">${buyUrl(p)?`<a class="btn pri" href="${esc(buyUrl(p))}" target="_blank" rel="${buyRel(p)}">쿠팡에서 보기</a>`:''}${cmpBtn(p,'btn cmp-b')}</div>`;
+  const d = $('#detail'); if(!d.open) d.showModal();
+}
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-cmp]'); if(t){ toggleCmp(t.dataset.cmp); return; }
+  const b = e.target.closest('[data-detail]'); if(b){ openDetail(b.dataset.detail); return; }
+  if(e.target.closest('#d-close') || e.target===$('#detail')) $('#detail').close();
+  if(e.target.closest('#c-close') || e.target===$('#cmp')) $('#cmp').close();
+});
+
+/* ---------- tabs ---------- */
+function showTab(id){
+  const rec = id!=='all';
+  $('#tab-rec').setAttribute('aria-selected', rec); $('#tab-all').setAttribute('aria-selected', !rec);
+  $('#view-rec').hidden = !rec; $('#view-all').hidden = rec; fabUpdate();
+}
+$('#tab-rec').addEventListener('click', ()=>showTab('rec'));
+$('#tab-all').addEventListener('click', ()=>showTab('all'));
+$('#ask-go').addEventListener('click', ()=>{ showTab('rec'); scrollTo({top:0}); });
+if(location.hash==='#rec') showTab('rec');
+
+/* weights table */
+function renderWTable(){
+  $('#wtable').innerHTML = `<tr><th>목적</th>${Object.keys(ML).map(k=>`<th>${ML[k]}</th>`).join('')}</tr>` +
+    Object.keys(DW).map(g=>{ const sh = share(g); return `<tr><td>${GOALN[g]}${isDefaultW(g)?'':' (조정됨)'}</td>${Object.keys(ML).map(k=>`<td class="num">${Math.round(sh[k]*100)}%</td>`).join('')}</tr>`; }).join('');
+}
+
+function update(){ try{ localStorage.setItem('ppick-answers', JSON.stringify(A)); }catch(e){} renderQuiz(); if(STEP>=DONE) renderResults(); else { $('#results').innerHTML = ''; fabUpdate(); } renderWTable(); }
+/* ---------- stamps ---------- */
+$('#st-col').textContent = `가격·순위·리뷰: ${META.collected||'—'} 수집`;
+$('#st-q').textContent = `품질 신뢰도 조사: ${META.quality||'—'}`;
+const AFF = P.filter(p=>p.aff).length; $('#disc').hidden = $('#ft-disc').hidden = AFF===0;
+$('#ft-src').textContent = `데이터: ${META.source||'—'}${META.published?` · ${META.published} 게시`:''}`;
+
+
+document.querySelectorAll('.n-all').forEach(e=>e.textContent = P.length);
+$('#cov-stamp').textContent = `맛·알레르기·영양 라벨 조사: ${COV.any}/${P.length}개`;
+/* 육각형 꼭짓점 끌기: 누른 곳에서 가까운 축을 골라, 축 방향 거리로 0~5 */
+let HXDRAG = null;
+function hxFromEvent(e, axis){
+  const svg = document.getElementById('hexc-svg'); if(!svg) return null;
+  const m = svg.getScreenCTM(); if(!m) return null;
+  const q = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse()), dx = q.x-HX.cx, dy = q.y-HX.cy;
+  if(axis==null){ const a = Math.atan2(dy, dx); let best = 0, bd = 9; for(let i=0;i<HK.length;i++){ let d = Math.abs(((a - hxAng(i, HK.length)) + 3*Math.PI) % (2*Math.PI) - Math.PI); if(d<bd){ bd = d; best = i; } } axis = best; }
+  const proj = dx*Math.cos(hxAng(axis, HK.length)) + dy*Math.sin(hxAng(axis, HK.length));
+  return {axis, v: Math.max(0, Math.min(5, Math.round(proj/HX.R*5)))};
+}
+$('#quiz').addEventListener('pointerdown', e=>{
+  if(!e.target.closest('#hexc-svg')) return;
+  const r = hxFromEvent(e); if(!r) return; HXDRAG = r.axis; e.preventDefault();
+  if(curHW()[HK[r.axis]]!==r.v) setHex(HK[r.axis], r.v);
+});
+addEventListener('pointermove', e=>{ if(HXDRAG==null) return; const r = hxFromEvent(e, HXDRAG); if(r && curHW()[HK[r.axis]]!==r.v) setHex(HK[r.axis], r.v); });
+addEventListener('pointerup', ()=>{ HXDRAG = null; });
+addEventListener('pointercancel', ()=>{ HXDRAG = null; });
+
+update(); renderCatalog(); refreshCmp();
+})();
+</script>
+
+</body></html>
