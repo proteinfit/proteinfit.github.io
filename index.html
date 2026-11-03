@@ -1060,7 +1060,7 @@ function srcGroup(p){
 P.forEach(p=>{ p.srcG = srcGroup(p); });
 const srcF = p => p.srcG;
 const SRCS = [['all','전체']].concat(SRC_ORDER.filter(s=>P.some(p=>p.srcG===s)).map(s=>[s,s]));
-const FLAGS = [['nomilk','우유 없음 확인'],['nosoy','대두 없음 확인'],['lacfree','락토프리 표기'],['cert','제3자 인증'],['noadd','첨가 경고 없음'],['main99','주원료 99% 이상'],['nosweet','인공감미료 없음'],['lowsugar','저당·저지방 (당류 1g·지방 2g 이하)']];
+const FLAGS = [['nomilk','우유 없음 (알레르기 고려)'],['nosoy','대두 없음 (알레르기 고려)'],['lacfree','락토프리 표기'],['cert','제3자 인증'],['noadd','첨가 경고 없음'],['main99','주원료 99% 이상'],['nosweet','인공감미료 없음'],['lowsugar','저당·저지방 (당류 1g·지방 2g 이하)']];
 function chipGroup(id, list, cur, multi){
   const g = $(id); const lab = g.querySelector('span').outerHTML;
   g.innerHTML = lab + list.map(([v,l])=>`<button class="chip" type="button" id="f-${id.slice(3)}-${esc(v)}" data-v="${esc(v)}" aria-pressed="${multi?cur.includes(v):cur===v}">${esc(l)}</button>`).join('');
