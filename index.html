@@ -880,7 +880,7 @@ const ptLabel = p => !p.ptype ? null : p.ptype.kind==='복합' ? '동식물성�
 function tagsHTML(p){
   const pl = ptLabel(p), t = [];
   if(pl) t.push(`<span class="tag" title="단백질 원료: ${esc(p.ptype.names.join(', '))}">${pl}</span>`);
-  t.push(`<span class="tag" title="원재료 1순위">주원료 ${esc(p.src)}</span>`);
+  t.push(`<span class="tag" title="원재료에서 처음 나오는 단백질 원료 기준">주원료 ${esc(p.srcG)}</span>`);
   if(p.cat!=='단백질 보충제') t.push(`<span class="tag">${p.cat}</span>`);
   if(p.cert3) t.push(`<span class="tag good">${esc(p.cert)}</span>`);
   else if(p.cert==='HACCP') t.push(`<span class="tag">HACCP</span>`);
@@ -951,7 +951,7 @@ function summaryHTML(pool, w, moved){
     A.ext.includes('cert')?'제3자 인증':null, A.ext.includes('nowarn')?'제품명 과장·첨가 경고 없음':null, A.ext.includes('single')?'단품':null, ...A.ext.filter(k=>EXTF[k]).map(k=>EXTN[k])].filter(Boolean);
   const avg = (arr,k)=>{ const v = arr.map(x=>x.p[k]).filter(x=>x!=null); return v.length? v.reduce((a,b)=>a+b,0)/v.length : null; };
   const t3 = pool.slice(0,3);
-  const srcCount = {}; t3.forEach(x=>srcCount[x.p.src]=(srcCount[x.p.src]||0)+1);
+  const srcCount = {}; t3.forEach(x=>srcCount[x.p.srcG]=(srcCount[x.p.srcG]||0)+1);
   const srcTxt = Object.entries(srcCount).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}개`).join(', ');
   const pA = avg(t3,'pct'), pB = avg(pool,'pct'), vA = avg(t3,'p20'), vB = avg(pool,'p20'), tA = avg(t3,'taste'), tB = avg(pool,'taste');
   const cmp = [];
@@ -1042,8 +1042,24 @@ function renderResults(){
 /* ---------- catalog ---------- */
 const F = {cat:'all', src:'all', flags:[], q:'', sort:'r'};
 const CATS = [['all','전체'],['단백질 보충제','단백질 보충제'],['게이너','게이너'],['식사대용','식사대용']];
-const srcF = p => p.src==='확인 불가' ? '기타' : p.src;  /* 주원료 필터: 확인 불가는 기타로 묶음 */
-const SRCS = [['all','전체']].concat([...new Set(P.map(srcF))].sort((a,b)=>(a==='기타')-(b==='기타')).map(s=>[s,s]));
+/* 주원료 필터 (2026-11-03): 원재료에서 처음 나오는 단백질 원료 기준. 복합 = 동물성+식물성(유청·MPC가 먼저면 복합(그 원료), 대두가 먼저면 복합(대두), 그 밖의 동물성이 먼저면 그 원료 칸) */
+const SRC_ORDER = ['복합(대두)','복합(WPC)','복합(WPI)','복합(MPC)','유청(WPI)','유청(WPC)','우유단백','카제인','산양유','대두','완두·현미 등','기타'];
+const SRC_A = {WPI:'유청(WPI)',WPH:'유청(WPI)',WPC:'유청(WPC)','유청':'유청(WPC)',MPC:'우유단백',MPI:'우유단백','우유단백':'우유단백','카제인':'카제인','산양유단백':'산양유'};
+const SRC_MIX = {WPI:'WPI',WPH:'WPI',WPC:'WPC','유청':'WPC',MPC:'MPC'};
+function srcGroup(p){
+  if(!p.ptype) return SRC_ORDER.includes(p.src) ? p.src : '기타';
+  const f = p.ptype.names[0];
+  if(p.ptype.kind==='복합'){
+    if(f==='ISP') return '복합(대두)';
+    if(SRC_MIX[f]) return `복합(${SRC_MIX[f]})`;
+    return SRC_A[f] || '기타';
+  }
+  if(p.ptype.kind==='식물성') return f==='ISP' ? '대두' : '완두·현미 등';
+  return SRC_A[f] || '기타';
+}
+P.forEach(p=>{ p.srcG = srcGroup(p); });
+const srcF = p => p.srcG;
+const SRCS = [['all','전체']].concat(SRC_ORDER.filter(s=>P.some(p=>p.srcG===s)).map(s=>[s,s]));
 const FLAGS = [['nomilk','우유 없음 확인'],['nosoy','대두 없음 확인'],['lacfree','락토프리 표기'],['cert','제3자 인증'],['noadd','첨가 경고 없음'],['main99','주원료 99% 이상'],['nosweet','인공감미료 없음'],['lowsugar','저당·저지방 (당류 1g·지방 2g 이하)']];
 function chipGroup(id, list, cur, multi){
   const g = $(id); const lab = g.querySelector('span').outerHTML;
@@ -1117,7 +1133,7 @@ function renderCmp(){
     ['영양정보 게시', p=>null, (v,p)=>p.nopost?`<span class="warn-t">미게시</span> <span class="rk na">${esc(p.nopost)}</span>`:'게시', null],
     ['라벨 표기 문제', p=>null, (v,p)=>p.lblx?`<span class="rk na">${esc(p.lblx)}</span>`:'없음', null],
     ['아미노산·콜라겐', p=>null, (v,p)=>p.addWarn.length?`<span class="warn-t">${p.addWarn.map(k=>ADDN[k]).join('·')} 첨가</span>`:p.addInfo.length?`<span class="rk na">${p.addInfo.map(k=>ADDN[k]).join('·')} 소량</span>`:'없음', null],
-    ['주원료', p=>null, (v,p)=>esc(p.src), null],
+    ['주원료', p=>null, (v,p)=>esc(p.srcG), null],
     ['맛', p=>null, (v,p)=>val(p.flavText), null],
     ['우유 함유', p=>null, (v,p)=>val(p.milk), null],
     ['대두 함유', p=>null, (v,p)=>val(p.soy), null],
