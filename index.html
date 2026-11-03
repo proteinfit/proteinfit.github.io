@@ -122,6 +122,14 @@ section[role=tabpanel]{padding-top:14px}
 .thumb.photo:not(.noimg) svg,.thumb.photo:not(.noimg) .th-lab{display:none}
 .th-lab{position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);font-size:12px;font-weight:800;color:#222;background:#fff;padding:1px 6px;border-radius:2px;white-space:nowrap;max-width:46%;overflow:hidden;text-overflow:ellipsis}
 .th-rk{position:absolute;left:0;top:0;min-width:26px;height:26px;padding:0 6px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font-size:13px;font-weight:800;border-bottom-right-radius:4px}
+.thumb.sold img,.thumb.sold svg{opacity:.35}
+.sold-lab{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;background:rgb(0 0 0 / .72);color:#fff;font-weight:800;font-size:15px;letter-spacing:.1em;padding:6px 0}
+.hxov{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgb(13 11 10 / .86);padding:2px}
+.thumb .hxov svg.hex.hex{display:block;position:static;inset:auto;width:100%;height:100%;max-width:none;margin:0}
+.hxov .hex text{font-size:27px}
+.hxov .hex polygon[fill="none"],.hxov .hex line{stroke:var(--rule)}
+.hxov .hex text:nth-of-type(2n){display:none}
+@media (hover:hover){.thumb[data-hx]:hover img,.thumb[data-hx]:hover svg:not(.hex){opacity:.15}.thumb[data-hx]:hover .hxov{display:flex}}
 .th-cat{position:absolute;right:6px;top:6px;font-size:11px;font-weight:700;background:rgb(0 0 0 / .6);color:#fff;padding:1px 6px;border-radius:2px}
 
 /* 가격 · 별점 */
@@ -460,11 +468,11 @@ const val = v => v==null||v==='' ? '<span class="rk na">확인 안 됨</span>' :
 const shortName = n => n.replace(/,\s*\d+(\.\d+)?\s*(kg|g|개|포|Pou\w*).*$/i,'').replace(/,\s*1개.*$/,'').trim();
 /* 상품 사진 대신: 통 모양에 맛 색, 주원료 이름 */
 const FLAVC = {'초코':'#6B4128','곡물·미숫가루':'#C9A06A','바닐라·밀크':'#EADBB8','커피':'#4A3424','말차·녹차':'#7FA35A','과일·디저트':'#EE8FA4','무맛':'#CFD3D8'};
-function thumb(p, badge){
+function thumb(p, badge, nohx){
   const img = IMGS[p.pid];
   const c = FLAVC[p.flav[0]] || '#9AA5B1';
   const lab = {'유청(WPI)':'WPI','유청(WPC)':'WPC','완두·현미 등':'완두·현미','확인 불가':'원료 ?'}[p.src] || p.src;
-  return `<span class="thumb${img?' photo':''}" aria-hidden="true">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('noimg');this.remove()">`:''}<svg viewBox="0 0 60 80"><rect x="8" y="2" width="44" height="13" rx="3" fill="#2B2F36"/><rect x="4" y="13" width="52" height="65" rx="7" fill="${c}"/><rect x="4" y="34" width="52" height="24" fill="#fff" opacity=".92"/></svg><span class="th-lab">${esc(lab)}</span>${badge?`<span class="th-rk">${badge}</span>`:''}${p.cat!=='단백질 보충제'?`<span class="th-cat">${p.cat}</span>`:''}</span>`;
+  return `<span class="thumb${img?' photo':''}${p.soldout?' sold':''}"${!p.soldout&&!nohx?` data-hx="${p.r}"`:''} aria-hidden="true">${img?`<img src="${esc(img)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.classList.add('noimg');this.remove()">`:''}<svg viewBox="0 0 60 80"><rect x="8" y="2" width="44" height="13" rx="3" fill="#2B2F36"/><rect x="4" y="13" width="52" height="65" rx="7" fill="${c}"/><rect x="4" y="34" width="52" height="24" fill="#fff" opacity=".92"/></svg><span class="th-lab">${esc(lab)}</span>${badge?`<span class="th-rk">${badge}</span>`:''}${p.cat!=='단백질 보충제'?`<span class="th-cat">${p.cat}</span>`:''}${p.soldout?'<span class="sold-lab">품절</span>':''}</span>`;
 }
 const rateHTML = p => p.rating==null ? `<span class="rate">평점 없음 (${p.rev.toLocaleString('ko-KR')})</span>` : `<span class="rate"><span class="stars" style="--r:${p.rating/5*100}%" aria-label="평점 ${p.rating}">★★★★★</span>(${p.rev.toLocaleString('ko-KR')})</span>`;
 const scoopTxt = p => `1스쿱 단백질 ${p.sp!=null?p.sp+'g':'확인 불가'}`;  /* 1스쿱 = 1회 제공량 */
@@ -1166,7 +1174,7 @@ const GRADE = {A:'A · 쿠팡 판매품 라벨에서 직접 확인',B:'B · 같�
 function openDetail(r){
   const p = P.find(x=>x.r===+r); if(!p) return;
   $('#sheet').innerHTML = `<button class="close" type="button" id="d-close" aria-label="닫기">×</button>
-    <div class="dt-top">${thumb(p, `${p.r}위`)}
+    <div class="dt-top">${thumb(p, `${p.r}위`, true)}
       <div class="info"><h2>${esc(p.n)}</h2>
         <div class="sub">${esc(p.mk)} · ${p.origin} · 쿠팡 랭킹 ${p.r}위 · 리뷰 ${p.rev.toLocaleString('ko-KR')}개 · 평점 ${p.rating??'—'}</div>
         ${rateHTML(p)}${priceHTML(p)}
@@ -1228,6 +1236,12 @@ $('#tab-rec').addEventListener('click', ()=>showTab('rec'));
 $('#tab-all').addEventListener('click', ()=>showTab('all'));
 $('#ask-go').addEventListener('click', ()=>{ showTab('rec'); scrollTo({top:0}); });
 if(location.hash==='#rec') showTab('rec');
+
+/* 사진에 마우스를 올리면 육각형 능력치 (품절 제외, 처음 올릴 때 그림) */
+document.addEventListener('mouseover', e=>{
+  const t = e.target.closest && e.target.closest('.thumb[data-hx]'); if(!t || t.querySelector('.hxov')) return;
+  const p = P.find(x=>x.r===+t.dataset.hx); if(p) t.insertAdjacentHTML('beforeend', `<span class="hxov">${hexSVG(p).replace('viewBox="-30 0 360 262"','viewBox="-105 -8 510 278"')}</span>`);
+});
 
 /* weights table */
 function renderWTable(){
