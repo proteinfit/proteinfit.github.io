@@ -1,4 +1,13 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script>
+/* 방문 분석: GA4 + Microsoft Clarity (공개 사이트에서만 켜짐) */
+window.dataLayer = window.dataLayer || []; function gtag(){ dataLayer.push(arguments); }
+(function(){ var GA = 'G-18K1P7PCM1', CL = '__CLARITY_ID__';
+  if(location.hostname !== 'proteinfit.github.io') return;
+  var s = document.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA; document.head.appendChild(s);
+  gtag('js', new Date()); gtag('config', GA);
+  if(CL.indexOf('__') !== 0) (function(c,l,a,r,i,t,y){ c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)}; t=l.createElement(r); t.async=1; t.src='https://www.clarity.ms/tag/'+i; y=l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t,y); })(window, document, 'clarity', 'script', CL);
+})();
+</script></head><body>
 <title>헬과장</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style id="css">
@@ -421,7 +430,7 @@ footer{margin-top:24px;font-size:12px;color:var(--muted)}
       <div><h4>데이터 읽는 법</h4><p>단백질 함량은 질소량으로 계산하기 때문에, 따로 넣은 아미노산이나 콜라겐도 단백질로 잡혀요. 이런 원료가 들어간 제품은 실제 단백질이 표시보다 낮을 수 있어요. 총량의 ‘약 N회분’은 총 중량을 1회 제공량으로 나눈 값이고, 1회 제공량은 제조사가 정한 양이라 한 스쿱이 아닐 수 있어요. 품질 신뢰도는 공개 자료로 확인된 항목만 점수를 준 값이라, 낮은 점수가 품질이 나쁘다는 뜻은 아닙니다. 맛·알레르기·영양 정보는 라벨에서 확인한 값만 보여주고, 아직 확인하지 않은 제품은 ‘확인 안 됨’으로 표시합니다. 라벨 문제는 세 가지로 나눠요. ‘제품명 과장’은 제품명에 적힌 단백질(예: WPI, 아이솔레이트, 산양유)과 달리 다른 단백질이 섞이거나 앞 순위인 경우(제품명에 혼합·블렌드·복합·매트릭스를 밝혔거나, 이름이 ‘아이솔레이트’이고 섞인 단백질이 모두 분리 단백질이면 제외), ‘영양정보 미게시’는 쿠팡 판매 페이지에 정식 영양정보표나 원재료표가 없는 경우(다른 사이트 라벨로 보충한 제품 포함), ‘라벨 표기 문제’는 제품명의 숫자·단위·기준·홍보 문구가 라벨과 맞지 않는 경우예요. 주원료는 원재료 1순위이고, ‘주원료 99% 이상’은 원재료표에서 1순위 원료에 99% 이상이 적혀 있거나, 원료가 하나뿐이거나, 나머지 원료가 모두 % 표기되어 합이 1% 이하인 제품이에요(표기가 없으면 넣지 않음). 게이너·식사대용은 상품명(게이너는 단백질 30% 미만이면서 말토덱스트린 포함도)으로 나눕니다.</p></div>
     </div>
   </details>
-  <footer><span id="ft-src"></span><span id="ft-disc" hidden>이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>판매가·순위·리뷰는 수집 시점 값이며 계속 바뀝니다. 단백질 보충제는 의약품이 아니며, 질환이 있거나 식단 제한이 있다면 전문가와 상의하세요.</footer>
+  <footer><span id="ft-src"></span><span id="ft-disc" hidden>이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.</span>판매가·순위·리뷰는 수집 시점 값이며 계속 바뀝니다. 단백질 보충제는 의약품이 아니며, 질환이 있거나 식단 제한이 있다면 전문가와 상의하세요. 사이트 개선을 위해 Google Analytics와 Microsoft Clarity로 개인을 알아볼 수 없는 이용 기록(방문·클릭·스크롤)을 수집합니다.</footer>
   </div>
 </div>
 
@@ -450,6 +459,10 @@ const META = window.PP_DATA.meta;
 /* 상품 대표 사진 주소 (쿠팡 상품번호 → 이미지 URL). 엑셀 업로드와 별도로 유지 */
 const IMGS = window.PP_IMGS || {};
 const $ = s => document.querySelector(s);
+/* 방문 분석 이벤트 (GA4 맞춤 이벤트 + Clarity 이벤트 태그) */
+const TRK = {};
+const track = (n, p={}) => { try{ gtag('event', n, p); if(window.clarity) clarity('event', n); }catch(e){} };
+const trackOnce = (n, p) => { if(!TRK[n]){ TRK[n] = 1; track(n, p); } };
 const won = v => v==null ? '확인 불가' : Math.round(v).toLocaleString('ko-KR')+'원';
 const pctS = v => v==null ? '확인 불가' : Math.round(v*100)+'%';
 const esc = s => String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -745,7 +758,7 @@ function hexFit(p){
   return t.reduce((a,ti,i)=>a + Math.min(v[i]==null ? 1.5 : v[i], ti), 0) / sum;  /* 값이 없으면 1.5점으로 봄 */
 }
 function saveHex(){ try{ localStorage.setItem('ppick-hex', JSON.stringify(HXS)); }catch(e){} }
-function setHex(k, val){ HXS = {edited:true, v:Object.assign({}, curHW(), {[k]: Math.max(0, Math.min(5, val))})}; saveHex(); drawHexC(); renderResults(); }
+function setHex(k, val){ trackOnce('hex_customize'); HXS = {edited:true, v:Object.assign({}, curHW(), {[k]: Math.max(0, Math.min(5, val))})}; saveHex(); drawHexC(); renderResults(); }
 function hexCustomHTML(){
   const hw = curHW(), t = hexTarget(), labs = ['유당 부담 적음','가격','맛','품질','첨가물 적음', A.src==='plant' ? '식물성 함유' : '동물성 함유', '단백질 함량', '인기', A.goal==='bulk' ? '칼로리 높음' : '칼로리 적음'], n = HK.length;
   const handles = t.map((v,i)=>{ const [x,y] = hxPt(i, HX.R*v/5, n); return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="var(--warn)" stroke="var(--panel)" stroke-width="2"/>`; }).join('');
@@ -779,13 +792,15 @@ function renderQuiz(){
   }
   el.innerHTML = h;
 }
-function chatGo(s){ STEP = s; EDIT = false; try{ localStorage.setItem('ppick-chat', String(STEP)); }catch(e){} update();
+function chatGo(s){ const wasEdit = EDIT; STEP = s; EDIT = false;
+  if(!wasEdit) track(STEP>=DONE ? 'quiz_complete' : 'quiz_step', STEP>=DONE ? {goal:A.goal, lac:A.lac, src:A.src, flav:A.flav, bud:A.bud, qual:A.qual, alg:A.alg.join(',')||'none'} : {step:STEP+1, question:Q[STEP].id});
+  try{ localStorage.setItem('ppick-chat', String(STEP)); }catch(e){} update();
   requestAnimationFrame(()=>{ const t = STEP>=DONE ? $('#results') : $('#quiz .chips.ans'); if(t) t.scrollIntoView({behavior:'smooth', block: STEP>=DONE ? 'start' : 'nearest'}); }); }
 function saveW(){ try{ localStorage.setItem('ppick-weights', JSON.stringify(CW)); }catch(e){} }
 $('#quiz').addEventListener('toggle', e=>{ if(e.target.matches('.wdet')) WOPEN = e.target.open; }, true);
 $('#quiz').addEventListener('input', e=>{
   const r = e.target.closest('input[data-w]'); if(!r) return;
-  CW[A.goal][r.dataset.w] = +r.value; r.setAttribute('aria-valuetext', r.value);
+  trackOnce('weights_adjust'); CW[A.goal][r.dataset.w] = +r.value; r.setAttribute('aria-valuetext', r.value);
   const sh = share(A.goal);
   for(const k in sh){ const b = document.getElementById('wv-'+k); if(b) b.textContent = Math.round(sh[k]*100)+'%'; }
   $('#w-reset').hidden = isDefaultW(A.goal);
@@ -795,15 +810,15 @@ $('#quiz').addEventListener('click', e=>{
   const hb = e.target.closest('[data-hx]'); if(hb){ setHex(hb.dataset.hx, curHW()[hb.dataset.hx] + +hb.dataset.d); return; }
   if(e.target.closest('#hx-reset')){ HXS = {edited:false, v:null}; saveHex(); drawHexC(); renderResults(); return; }
   if(e.target.closest('#w-reset')){ CW[A.goal] = clone(DW[A.goal]); saveW(); update(); return; }
-  if(e.target.closest('#q-reset')){ A = clone(DEF); CW = clone(DW); saveW(); HXS = {edited:false, v:null}; saveHex(); WOPEN = false; chatGo(0); return; }
+  if(e.target.closest('#q-reset')){ track('quiz_reset'); A = clone(DEF); CW = clone(DW); saveW(); HXS = {edited:false, v:null}; saveHex(); WOPEN = false; chatGo(0); return; }
   const ed = e.target.closest('[data-edit]'); if(ed){ STEP = +ed.dataset.edit; EDIT = true; update(); requestAnimationFrame(()=>{ const c = $('#quiz .chips.ans'); if(c) c.scrollIntoView({behavior:'smooth', block:'nearest'}); }); return; }
   const done = () => chatGo(EDIT ? DONE : nextStep(STEP));
-  if(e.target.closest('[data-next]')){ done(); return; }
+  if(e.target.closest('[data-next]')){ const cq = Q[STEP]; if(cq && cq.multi) track('quiz_answer', {question:cq.id, answer:A[cq.id].join(',')||'none'}); done(); return; }
   const b = e.target.closest('.chip'); if(!b) return;
   const q = Q.find(x=>x.id===b.dataset.q), v = b.dataset.v;
-  if(q.id==='alg' && v==='none'){ A.alg = []; done(); return; }
+  if(q.id==='alg' && v==='none'){ A.alg = []; track('quiz_answer', {question:'alg', answer:'none'}); done(); return; }
   else if(q.multi){ A[q.id] = A[q.id].includes(v) ? A[q.id].filter(x=>x!==v) : A[q.id].concat(v); }
-  else { A[q.id] = v; done(); return; }
+  else { A[q.id] = v; track('quiz_answer', {question:q.id, answer:v}); done(); return; }
   update();
 });
 
@@ -1090,12 +1105,13 @@ function renderCatalog(){
 $('#view-all').addEventListener('click', e=>{
   const b = e.target.closest('.filters .chip'); if(!b) return;
   const g = b.parentElement.id, v = b.dataset.v;
+  track('filter_use', {filter:g.slice(2), value:v});
   if(g==='f-cat') F.cat=v; else if(g==='f-src') F.src=v; else F.flags = F.flags.includes(v)?F.flags.filter(x=>x!==v):F.flags.concat(v);
   renderCatalog();
 });
-$('#q-search').addEventListener('input', e=>{F.q=e.target.value; renderCatalog(); if(F.q.trim()) showTab('all');});
+$('#q-search').addEventListener('input', e=>{F.q=e.target.value; clearTimeout(TRK.st); TRK.st = setTimeout(()=>{ const t = F.q.trim(); if(t) track('search', {search_term:t}); }, 1500); renderCatalog(); if(F.q.trim()) showTab('all');});
 $('#sbar').addEventListener('submit', e=>{ e.preventDefault(); showTab('all'); });
-$('#q-sort').addEventListener('click', e=>{ const b = e.target.closest('[data-sort]'); if(!b) return; F.sort=b.dataset.sort;
+$('#q-sort').addEventListener('click', e=>{ const b = e.target.closest('[data-sort]'); if(!b) return; F.sort=b.dataset.sort; track('sort_use', {sort:F.sort});
   document.querySelectorAll('#q-sort [data-sort]').forEach(x=>x.setAttribute('aria-pressed', x===b)); renderCatalog(); });
 
 /* ---------- compare (최대 3개, 이 브라우저에만 기억) ---------- */
@@ -1118,7 +1134,7 @@ function toggleCmp(r){
   const p = P.find(x=>x.r===+r); if(!p) return;
   if(inCmp(p)) CMP = CMP.filter(n=>n!==p.n);
   else if(CMP.length>=3) return refreshCmp('3개까지 비교할 수 있어요. 하나를 빼고 담아 주세요.');
-  else CMP = CMP.concat(p.n);
+  else { CMP = CMP.concat(p.n); track('compare_add', {product_name:p.n, rank:p.r}); }
   saveCmp(); refreshCmp();
 }
 function renderCmp(){
@@ -1166,7 +1182,7 @@ function renderCmp(){
       <tfoot><tr><th scope="row"></th>${ps.map(p=>`<td><div class="cmp-acts">${buyUrl(p)?`<a class="btn pri" href="${esc(buyUrl(p))}" target="_blank" rel="${buyRel(p)}">쿠팡에서 보기</a>`:''}<button class="btn cmp-keep" type="button" data-cmp="${p.r}">빼기</button></div></td>`).join('')}</tr></tfoot>
     </table></div>`;
 }
-$('#tray-go').addEventListener('click', ()=>{ if(CMP.length<2) return; renderCmp(); const d = $('#cmp'); if(!d.open) d.showModal(); });
+$('#tray-go').addEventListener('click', ()=>{ if(CMP.length<2) return; track('compare_open', {count:CMP.length}); renderCmp(); const d = $('#cmp'); if(!d.open) d.showModal(); });
 $('#tray-clear').addEventListener('click', ()=>{ CMP = []; saveCmp(); refreshCmp(); });
 
 /* ---------- detail ---------- */
@@ -1174,6 +1190,7 @@ const QD = [['제3자 인증',25],['성적서 공개',20],['아미노산 조성'
 const GRADE = {A:'A · 쿠팡 판매품 라벨에서 직접 확인',B:'B · 같은 맛 해외 공식 라벨',C:'C · 다른 맛·버전 라벨 (값이 다를 수 있음)',D:'D · 핵심값 일부 확인 불가'};
 function openDetail(r){
   const p = P.find(x=>x.r===+r); if(!p) return;
+  track('product_view', {product_name:p.n, rank:p.r});
   $('#sheet').innerHTML = `<button class="close" type="button" id="d-close" aria-label="닫기">×</button>
     <div class="dt-top">${thumb(p, `${p.r}위`, true)}
       <div class="info"><h2>${esc(p.n)}</h2>
@@ -1221,6 +1238,8 @@ function openDetail(r){
   const d = $('#detail'); if(!d.open) d.showModal();
 }
 document.addEventListener('click', e=>{
+  const a = e.target.closest('a[href]'), bp = a && P.find(x=>buyUrl(x)===a.getAttribute('href'));
+  if(bp) track('coupang_click', {product_name:bp.n, rank:bp.r, affiliate:bp.aff?'yes':'no', place:a.closest('#detail')?'detail':a.closest('#cmp')?'compare':a.closest('#results')?'recommend':a.closest('#catalog')?'catalog':'other'});
   const t = e.target.closest('[data-cmp]'); if(t){ toggleCmp(t.dataset.cmp); return; }
   const b = e.target.closest('[data-detail]'); if(b){ openDetail(b.dataset.detail); return; }
   if(e.target.closest('#d-close') || e.target===$('#detail')) $('#detail').close();
@@ -1233,9 +1252,9 @@ function showTab(id){
   $('#tab-rec').setAttribute('aria-selected', rec); $('#tab-all').setAttribute('aria-selected', !rec);
   $('#view-rec').hidden = !rec; $('#view-all').hidden = rec; fabUpdate();
 }
-$('#tab-rec').addEventListener('click', ()=>showTab('rec'));
-$('#tab-all').addEventListener('click', ()=>showTab('all'));
-$('#ask-go').addEventListener('click', ()=>{ showTab('rec'); scrollTo({top:0}); });
+$('#tab-rec').addEventListener('click', ()=>{ track('tab_view', {tab:'rec'}); showTab('rec'); });
+$('#tab-all').addEventListener('click', ()=>{ track('tab_view', {tab:'all'}); showTab('all'); });
+$('#ask-go').addEventListener('click', ()=>{ track('tab_view', {tab:'rec', from:'ask'}); showTab('rec'); scrollTo({top:0}); });
 if(location.hash==='#rec') showTab('rec');
 
 /* 사진에 마우스를 올리면 육각형 능력치 (품절 제외, 처음 올릴 때 그림) */
