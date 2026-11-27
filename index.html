@@ -1064,7 +1064,7 @@ function renderResults(){
 }
 
 /* ---------- catalog ---------- */
-const F = {cat:'all', src:'all', flags:[], q:'', sort:'r'};
+const F = {cat:'all', src:'all', flags:[], q:'', sort:['r']};  /* 정렬 기준 여러 개 선택 가능 (2026-11-27) */
 const CATS = [['all','전체'],['단백질 보충제','단백질 보충제'],['게이너','게이너'],['식사대용','식사대용']];
 /* 주원료 필터 (2026-11-03): 원재료에서 처음 나오는 단백질 원료 기준. 복합 = 동물성+식물성(유청·MPC가 먼저면 복합(그 원료), 대두가 먼저면 복합(대두), 그 밖의 동물성이 먼저면 그 원료 칸) */
 const SRC_ORDER = ['복합(대두)','복합(WPC)','복합(WPI)','복합(MPC)','유청(WPI)','유청(WPC)','우유단백','카제인','산양유','대두','완두·현미 등','기타'];
@@ -1095,11 +1095,16 @@ function renderCatalog(){
   let rows = P.filter(p=>(F.cat==='all'||p.cat===F.cat)&&(F.src==='all'||srcF(p)===F.src)
     &&(!F.flags.includes('nomilk')||p.milk==='없음')&&(!F.flags.includes('nosoy')||p.soy==='없음')&&(!F.flags.includes('lacfree')||p.lacfree==='있음')&&(!F.flags.includes('cert')||p.cert3)&&(!F.flags.includes('noadd')||!p.addWarn.length)&&F.flags.every(k=>!EXTF[k]||EXTF[k](p))
     &&(!q||[p.n,p.ing,p.mk,p.ingFull,p.flavText].join(' ').toLowerCase().includes(q)));
-  const s = F.sort, nullLast = (a,b,f)=> (a==null)-(b==null) || f();
-  const cmp = {r:(a,b)=>a.r-b.r, p20:(a,b)=>nullLast(a.p20,b.p20,()=>a.p20-b.p20), pct:(a,b)=>nullLast(a.pct,b.pct,()=>b.pct-a.pct),
-    taste:(a,b)=>nullLast(a.tb,b.tb,()=>b.tb-a.tb), q:(a,b)=>b.q-a.q||a.r-b.r, price:(a,b)=>a.price-b.price, scoop:(a,b)=>nullLast(a.perServ,b.perServ,()=>a.perServ-b.perServ)}[s];
-  rows.sort(cmp);
-  $('#cat-count').textContent = `${rows.length}개 제품` + (s==='taste'?' · 맛은 리뷰 수를 반영한 보정값 순':'');
+  const S = F.sort, nullLast = (a,b,f)=> (a==null)-(b==null) || f();
+  const CMP_S = {r:(a,b)=>a.r-b.r, p20:(a,b)=>nullLast(a.p20,b.p20,()=>a.p20-b.p20), pct:(a,b)=>nullLast(a.pct,b.pct,()=>b.pct-a.pct),
+    taste:(a,b)=>nullLast(a.tb,b.tb,()=>b.tb-a.tb), q:(a,b)=>b.q-a.q||a.r-b.r, price:(a,b)=>a.price-b.price, scoop:(a,b)=>nullLast(a.perServ,b.perServ,()=>a.perServ-b.perServ)};
+  if(S.length===1) rows.sort(CMP_S[S[0]]);
+  else {  /* 여러 기준: 기준마다 순위(같으면 같은 순위, 값 없으면 꼴찌)를 매겨 평균이 낮은 순, 같으면 쿠팡 랭킹순 */
+    const rk = new Map(rows.map(p=>[p,0]));
+    S.forEach(k=>{ const c = k==='q' ? (a,b)=>b.q-a.q : CMP_S[k], o = rows.slice().sort(c); let r = 0; o.forEach((p,i)=>{ if(i && c(o[i-1],p)!==0) r = i; rk.set(p, rk.get(p)+r); }); });
+    rows.sort((a,b)=>rk.get(a)-rk.get(b) || a.r-b.r);
+  }
+  $('#cat-count').textContent = `${rows.length}개 제품` + (S.length>1?` · 고른 기준 ${S.length}개의 순위를 평균한 순`:' · 정렬 기준은 여러 개 함께 고를 수 있어요') + (S.includes('taste')?' · 맛은 리뷰 수를 반영한 보정값 순':'');
   $('#catalog').innerHTML = rows.length ? rows.map(p=>itemRow(p, p.r)).join('') : `<div class="empty">조건에 맞는 제품이 없어요. 필터를 하나 풀어보세요.</div>`;
 }
 $('#view-all').addEventListener('click', e=>{
@@ -1111,8 +1116,11 @@ $('#view-all').addEventListener('click', e=>{
 });
 $('#q-search').addEventListener('input', e=>{F.q=e.target.value; clearTimeout(TRK.st); TRK.st = setTimeout(()=>{ const t = F.q.trim(); if(t) track('search', {search_term:t}); }, 1500); renderCatalog(); if(F.q.trim()) showTab('all');});
 $('#sbar').addEventListener('submit', e=>{ e.preventDefault(); showTab('all'); });
-$('#q-sort').addEventListener('click', e=>{ const b = e.target.closest('[data-sort]'); if(!b) return; F.sort=b.dataset.sort; track('sort_use', {sort:F.sort});
-  document.querySelectorAll('#q-sort [data-sort]').forEach(x=>x.setAttribute('aria-pressed', x===b)); renderCatalog(); });
+$('#q-sort').addEventListener('click', e=>{ const b = e.target.closest('[data-sort]'); if(!b) return; const v = b.dataset.sort;
+  F.sort = F.sort.includes(v) ? F.sort.filter(x=>x!==v) : F.sort.filter(x=>x!=='r').concat(v);  /* 쿠팡 랭킹순은 기본값: 다른 기준을 고르면 빠지고, 다 풀면 돌아옴 */
+  if(!F.sort.length || v==='r') F.sort = ['r'];
+  track('sort_use', {sort:F.sort.join('+')});
+  document.querySelectorAll('#q-sort [data-sort]').forEach(x=>x.setAttribute('aria-pressed', F.sort.includes(x.dataset.sort))); renderCatalog(); });
 
 /* ---------- compare (최대 3개, 이 브라우저에만 기억) ---------- */
 let CMP = [];
